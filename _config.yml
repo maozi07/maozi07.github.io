@@ -19,13 +19,21 @@ github_username:  maozi07
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
+
 kramdown:
   input: GFM
+  auto_ids:       true
+  footnote_nr:    1
+  entity_output:  as_char
+  toc_levels:     1..6
+  smart_quotes:   lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+  syntax_highlighter: rouge
+  hard_wrap: false
+
   extensions:
     - autolink
     - footnotes
     - smart
-  use_coderay: true
-  syntax_highlighter: rouge
-  coderay:
-    coderay_line_numbers:  nil
+    - table
