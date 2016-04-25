@@ -17,6 +17,8 @@ url: "http://louguanstar.com" # the base hostname & protocol for your site
 #twitter_username: jekyllrb
 github_username:  maozi07
 
+author: louguanstar
+
 # Build settings
 markdown: kramdown
 highlighter: rouge
