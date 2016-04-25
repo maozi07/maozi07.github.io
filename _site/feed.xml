@@ -6,9 +6,21 @@
 </description>
     <link>http://louguanstar.com/</link>
     <atom:link href="http://louguanstar.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 25 Apr 2016 22:47:03 +0800</pubDate>
-    <lastBuildDate>Mon, 25 Apr 2016 22:47:03 +0800</lastBuildDate>
+    <pubDate>Mon, 25 Apr 2016 23:35:05 +0800</pubDate>
+    <lastBuildDate>Mon, 25 Apr 2016 23:35:05 +0800</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
+    
+      <item>
+        <title>近来来的感受</title>
+        <description>&lt;p&gt;毕业近一年，一直都比较迷茫，对于前途对于未来有些不知所措，看着别人的工资，想着自己的前途，不知道未来在哪儿…还好身边一直有个人，虽然时不时会不愉快。
+刚刚换了工作，以外包的身份在联想工作，虽然有不好但工资不错更重要的是这对于个人来说也是一个机遇。快一年了，积蓄一直是负数，东西买了一大堆可是总觉得心中不踏实。趁着在联想这边工作，好好学些知识，关于大数据的、关于自动化运维的、继续好好熟悉Bash与Python，积攒一些积蓄。来年或者一段时间之后再回来看看，回顾回顾，在此做个记录。&lt;/p&gt;
+</description>
+        <pubDate>Mon, 25 Apr 2016 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Curabitur</title>
@@ -21,9 +33,9 @@ Curabitur orci turpis, egestas placerat velit eget, dictum pellentesque ipsum. S
 
 &lt;p&gt;Sed lobortis urna ut mi volutpat, sit amet euismod sapien tincidunt. Nulla facilisi. Pellentesque quis tempus neque. Mauris dictum ac sapien nec congue. In hac habitasse platea dictumst. Duis id pellentesque nisl. Morbi eget massa magna.&lt;/p&gt;
 </description>
-        <pubDate>Tue, 17 Feb 2015 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2015/02/17/Curabitur.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2015/02/17/Curabitur.html</guid>
+        <pubDate>Wed, 17 Feb 2016 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2016/02/17/Curabitur.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2016/02/17/Curabitur.html</guid>
         
         
       </item>
@@ -41,9 +53,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi cursus fringilla 
 
 &lt;p&gt;Sed lobortis urna ut mi volutpat, sit amet euismod sapien tincidunt. Nulla facilisi. Pellentesque quis tempus neque. Mauris dictum ac sapien nec congue. In hac habitasse platea dictumst. Duis id pellentesque nisl. Morbi eget massa magna.&lt;/p&gt;
 </description>
-        <pubDate>Fri, 30 Jan 2015 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2015/01/30/Lorem.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2015/01/30/Lorem.html</guid>
+        <pubDate>Fri, 01 Jan 2016 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2016/01/01/Lorem.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2016/01/01/Lorem.html</guid>
         
         
       </item>
