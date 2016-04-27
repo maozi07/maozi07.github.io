@@ -5,7 +5,7 @@ layout: default
     <div class="container">
         <header class="major">
             <h2>{{ page.title }}</h2>
-                <p class="post-meta">{{ page.date | date: "%b %-d, %Y" }}{% if site.author %} • {{ site.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
+                <p class="post-meta">{{ page.date | date: "%b %-d, %Y" }}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
         </header>
 
         <section class="post-content">
@@ -14,26 +14,34 @@ layout: default
 
         <footer>
             {% if page.previous %}
-            <a href="{{ page.previous.url }}" class="float-left">&larr; Previous post</a> {% endif %}
+            <a href="{{ page.previous.url }}" class="float-left">&larr; Previous</a> {% endif %}
             {% if page.next %}
-            <a href="{{ page.next.url }}" class="float-right">Next post &rarr;</a> {% endif %}
+            <a href="{{ page.next.url }}" class="float-right">Next &rarr;</a> {% endif %}
+
+        </footer>
+
+        <div id="footer" class="copyright">
+            <ul class="copyright">
+                <li>本文系原创，转载请注明：转自<a target="_blank" href="http://www.louguanstar.com">LouguanStar's Blog</a>，作者：<a target="_blank" href="http://wwww.louguanstar.com/about/">LouguanStar</a></li>
+                <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
+            </ul>
             <!-- 多说评论框 start -->
-            	<div class="ds-thread" data-thread-key="{{ page.id }}" data-title="{{ page.title }}" data-url="{{ site.url }}/{{ page.url }}"></div>
+                <div class="ds-thread" data-thread-key="{{ page.id }}" data-title="{{ page.title }}" data-url="{{ site.url }}/{{ page.url }}"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">
             var duoshuoQuery = {short_name:"louguanstar"};
-            	(function() {
-            		var ds = document.createElement('script');
-            		ds.type = 'text/javascript';ds.async = true;
-            		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-            		ds.charset = 'UTF-8';
-            		(document.getElementsByTagName('head')[0]
-            		 || document.getElementsByTagName('body')[0]).appendChild(ds);
-            	})();
-        	</script>
-        <!-- 多说公共JS代码 end -->
-        </footer>
+                (function() {
+                    var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                    ds.charset = 'UTF-8';
+                    (document.getElementsByTagName('head')[0]
+                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                })();
+            </script>
+            <!-- 多说公共JS代码 end -->
+        </div>
 
     </div>
 

@@ -57,28 +57,56 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Lorem</h2>
-                <p class="post-meta">Jan 1, 2016</p>
+            <h2>Linux内存文件系统(ramfs,tmpfs)比较</h2>
+                <p class="post-meta">Apr 27, 2016</p>
         </header>
 
         <section class="post-content">
-            <p><img src="/images/pic02.jpg" />
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi cursus fringilla dui. Donec laoreet maximus elit. Mauris ullamcorper condimentum lobortis. Donec maximus, mi vitae iaculis placerat, ligula mi maximus lectus, ac varius mi nulla id neque. Quisque porta eros nisi, eu fringilla urna dictum vitae. Vestibulum id metus eu nisl sodales consectetur. Phasellus et ultrices lacus.</p>
+            <h3 id="ramfs">ramfs</h3>
+<ol>
+  <li>ramfs制使用物理内存，挂载时不可限制大小</li>
+  <li>写入的文件都会保存在内存中，内存耗尽时Linux系统会触发OOM killer（Out Of Memory killer）</li>
+  <li>手动删除文件可释放空间</li>
+</ol>
 
-<p>Curabitur orci turpis, egestas placerat velit eget, dictum pellentesque ipsum. Suspendisse potenti. Suspendisse ac maximus arcu. Sed ut mattis ex. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum eleifend odio vitae varius aliquam. Quisque ac pretium nisi. Curabitur tempus urna ac ultrices commodo.</p>
+<p>因此使用时要特别小心以防触发OOM killer，OOM killer触发时系统会很卡接近死机，停止向内存中写数据系统会慢慢恢复</p>
 
-<p>Curabitur iaculis est at mattis mattis. Aliquam erat volutpat. Etiam vitae cursus quam. Nunc ultricies nunc non lorem fringilla cursus. Etiam dapibus libero ac turpis accumsan pulvinar. Sed auctor velit eget mi consequat bibendum. Aliquam interdum purus eget metus pretium ullamcorper.</p>
+<p>可使用下面命令将内存挂在为硬盘上一个文件使用：</p>
 
-<p>Pellentesque feugiat ex non ligula commodo, eget varius tortor pellentesque. Pellentesque id tortor felis. Cras fringilla ante eget orci laoreet, non consequat urna suscipit. Pellentesque luctus ac nulla vitae porttitor. Proin sed tortor quis magna efficitur efficitur a id leo. Donec efficitur augue et laoreet maximus. Ut semper egestas porttitor. Phasellus sagittis vulputate sem at laoreet.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>mkdir /ramtest
+mount -t ramfs ramfs /ramtest
+</code></pre>
+</div>
 
-<p>Sed lobortis urna ut mi volutpat, sit amet euismod sapien tincidunt. Nulla facilisi. Pellentesque quis tempus neque. Mauris dictum ac sapien nec congue. In hac habitasse platea dictumst. Duis id pellentesque nisl. Morbi eget massa magna.</p>
+<h3 id="tmpfs">tmpfs</h3>
+<ol>
+  <li>tmpfs使用物理内存与交换空间，默认50%内存＋交换空间大小，可指定文件系统大小</li>
+  <li>文件写入超出指定大小会无法写入，与向一个磁盘写数据直到超出磁盘容量情况相同</li>
+  <li>手动删除文件可释放空间</li>
+</ol>
+
+<p>例子：</p>
+
+<p>如有200M大小tmpfs，先写入test1 150M后写入test2 100M 最后test2只有部分写入，test2实际文件大小50M文件被部分截断</p>
+
+<p>可使用下面命令挂载tmpfs，<code class="highlighter-rouge">-o size=200m</code>参数用于指定文件最大容量,大小可使用k,m,g指定</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>mount -t tmpfs tmpfs /ramtest -o size=200m
+</code></pre>
+</div>
+
+<h3 id="section">参考资料</h3>
+
+<blockquote>
+  <p><a href="https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt">https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt</a></p>
+</blockquote>
 
         </section>
 
         <footer>
             
+            <a href="/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/02/17/Curabitur.html" class="float-right">Next post &rarr;</a> 
 
         </footer>
 
@@ -88,7 +116,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi cursus fringilla 
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
             <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/01/01/Lorem" data-title="Lorem" data-url="http://louguanstar.com//2016/01/01/Lorem.html"></div>
+                <div class="ds-thread" data-thread-key="/2016/04/27/Linux内存文件系统(ramfs,tmpfs)比较" data-title="Linux内存文件系统(ramfs,tmpfs)比较" data-url="http://louguanstar.com//2016/04/27/Linux%E5%86%85%E5%AD%98%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F(ramfs,tmpfs)%E6%AF%94%E8%BE%83.html"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">
