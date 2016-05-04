@@ -1,0 +1,33 @@
+---
+layout: post
+---
+
+FreeBSD作为一款Unix操作表现出强大的稳定性与安全性，乔布斯曾挖走FreeBSD的创始人去开发Mac OSX所依两者有很多相似的地方。个人使用感觉两者的稳定性比起Linux要优秀很多。今日闲来无事就在虚拟机上体验了下。
+
+### 软件管理
+
+首先直接跳过了操作系统的安装，说实话对于一个熟悉Linux的人来说，FreeBSD的安装不会有什么大的问题。FreeBSD／OSX包含的工作也很多与Linux相同，这也是为什么很多码农喜欢用Mac的原因之一吧。
+
+#### pkg(packages)与port
+
+packages与port都为FreeBSD下安装程序的工具，packages用来安装二进制包，ports使用源码来安装程序。两者都可以处理包的依赖关系，使用packages或port来安装应用时都会安装有相应依赖关系的程序或者库。以下为两者的一些主要区别：
+
+1. 一个压缩过的二进制安装包通常比一个包含源码的包小
+2. Packages不需要额外的编译时间，对于大的应用比如：FireFox，KED，GNOME编译会比较久
+3. 使用port编译时可以添加一些编译选项，比如编译Apache可以指定包含哪些模块，二进制包能包含大多数情况
+4. 有些许可禁止使用二进制包分发
+5. 有人可能觉得二进制包不安全或者喜欢通过阅读源码去解决一些问题
+6. 源码对自己打补丁很有用
+
+最新的FreeBSD已经抛弃老的pkg工作，老式的系统安装软件使用pkg_add，现在的则是pkg install。在最近的FreeBSD中pkg与yum／apt这类工具更相似，使得FreeBSD下安装软件更容易。不过由于FreeBSD最近才切换到新的pkg，所以如果你使用的FreeBSD10.X（9.X未验证，8.X都是老的pkg）就可以方便的使用pkg，不过由于这个比较新所以国内没有可用的pkg源，包括阿里、中科大等都没有源可用，国内使用体验很是不好（全球官方列出的源也不超过10个）。
+
+#### pkg使用
+
+1. 查找软件`pkg search package_name`
+2. 安装软件`pkg install package_name`
+3. 删除软件`pkg delete package_name`
+4. 删除不再需要的依赖`pkg autoremove`
+
+### 参考文档与相关链接
+> FreeBSD的官方文档还是很齐全的，需要什么都可以去官网找到，绝对应用尽有
+> [官方FTP中国站点：ftp://ftp.cn.freebsd.org/pub/FreeBSD/](ftp://ftp.cn.freebsd.org/pub/FreeBSD/)
