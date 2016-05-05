@@ -30,5 +30,4 @@ packages与port都为FreeBSD下安装程序的工具，packages用来安装二�
 
 ### 参考文档与相关链接
 > FreeBSD的官方文档还是很齐全的，需要什么都可以去官网找到，绝对应用尽有
-
 [官方FTP中国站点：ftp://ftp.cn.freebsd.org/pub/FreeBSD/](ftp://ftp.cn.freebsd.org/pub/FreeBSD/)
