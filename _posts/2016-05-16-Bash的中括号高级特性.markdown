@@ -1,0 +1,90 @@
+---
+layout: post
+---
+
+本文主要详细介绍Bash中{}的详细用法，由于Bash中的变量类型只有字符串故下文字符串与变量同指代Bash中的变量，部分配有例子。
+
+### 字符串基本
+string=1234.123
+
+- 分隔变量与字符串
+
+```
+echo ${string}1    #1234.1231
+```
+- ${#string}统计变量字符串长度
+
+```
+echo ${#string}    #8
+```
+- ${string:start:length}截取字符串，从第start个字符开始共length个字符
+
+```
+echo ${string:7:1}    #3
+echo ${string:(-4)}    #.123
+```
+### 字符串匹配切片（可用来踢去文件后缀，文件路径等）
+- ${string#substring}删除最先匹配到的字符（substring）的左边
+- ${string##substring}删除最后匹配到的字符（substring）的左边
+
+```
+stringZ=abcABC123ABCabc
+#删除最先匹配的左边
+echo ${stringZ#a*C}   #123ABCabc
+#删除最后匹配到的左边
+echo ${stringZ##a*C}   #abc
+```
+- ${string%substring}从string后边开始匹配，删除最先匹配到（substring）的右边
+- ${string%%substring}从string后边开始匹配，删除最后匹配到（substring）的右边
+
+```
+string=abcABC123ABCabc
+echo ${string%abc}    #abcABC123ABC
+echo ${string%%A*}    #abc
+```
+
+注意`本小节中的substring必须为全匹配`，所以例子中才会出现通配符*，如下：
+
+```
+string=abcABC123ABCabc
+echo ${string##123}    #abcABC123ABCabc
+echo ${string%%123}    #abcABC123ABCabc
+```
+
+### 字符串替换
+- ${string/substring/replacement}    将第一个匹配到的substring替换为replacement
+- ${string//substring/replacement}    将所有匹配到的substring替换为replacement
+
+```
+string=abcABC123ABCabc
+echo ${string/abc/xyz}    #xyzABC123ABCabc
+echo ${string//abc/xyz}    #xyzABC123ABCxyz
+```
+- ${string/#substring/replacement}   将字符串开始匹配（全匹配）到的第一个substring用replacement替换
+- ${string/%substring/replacement}   从字符串末尾开始匹配，将第一个匹配（全匹配）到的substring用replacement替换
+
+```
+string=abcABC123ABCabc
+echo ${string/#a*c/xyz}    #xyz
+echo ${string/%abc/xyz}    #abcABC123ABCxyz
+```
+
+### 变量判断
+- ${parameter-default}, ${parameter:-default}
+
+如果变量parameter没有赋值，default最为parameter默认值，:的区别在于变量parameter已经被声明但是null
+
+- ${parameter=default}, ${parameter:=default}
+
+如果变量parameter没有声明，default最为parameter默认值，:的区别在于变量parameter已经被声明但是null
+
+- ${parameter+alt_value}, ${parameter:+alt_value}
+
+如果变量parameter已经设定，使用alt_value，否则使用null
+
+- ${parameter?err_msg}, ${parameter:?err_msg}，:的区别在于变量parameter已经被声明但是null
+
+如果变量parameter已经设定，使用变量，否则打印err_msg退出脚本返回状态码1
+
+### 参考文档与相关链接
+> 1. [Advanced Bash-Scripting Guide](http://www.tldp.org/LDP/abs/abs-guide.pdf)
