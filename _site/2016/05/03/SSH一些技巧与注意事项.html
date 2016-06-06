@@ -57,59 +57,39 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Linux ramfs与tmpfs比较</h2>
-                <p class="post-meta">Apr 27, 2016</p>
+            <h2>Ssh一些技巧与注意事项</h2>
+                <p class="post-meta">May 3, 2016</p>
         </header>
 
         <section class="post-content">
-            <h4 id="ramfstmpfs">ramfs与tmpfs都可挂载内存为硬盘上的目录，通俗的就是内存当作磁盘使用</h4>
+            <p>主要记录平时使用SSH过程中积累的一些经验</p>
 
-<h3 id="ramfs">ramfs</h3>
-<ol>
-  <li>ramfs制使用物理内存，挂载时不可限制大小</li>
-  <li>写入的文件都会保存在内存中，内存耗尽时Linux系统会触发OOM killer（Out Of Memory killer）</li>
-  <li>手动删除文件可释放空间</li>
-</ol>
+<h3 id="ssh">关于SSH密钥</h3>
 
-<p>因此使用时要特别小心以防触发OOM killer，OOM killer触发时系统会很卡接近死机，停止向内存中写数据系统会慢慢恢复</p>
+<p>SSH生成密钥的命令，使用下面的命令可直接生成密钥，避免交互输入，可直接写成shell脚本</p>
 
-<p>可使用下面命令将内存挂在为硬盘上一个文件使用：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>mkdir /ramtest
-mount -t ramfs ramfs /ramtest
+<div class="highlighter-rouge"><pre class="highlight"><code>ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
 </code></pre>
 </div>
 
-<h3 id="tmpfs">tmpfs</h3>
+<h3 id="ssh-1">需要注意的，会引起SSH无密钥无法工作</h3>
+
+<p>SSH以无密钥运行时会检测文件系统相关文件的权限，如若文件权限不合适，SSH会认为不安全，造成无密钥无法连接</p>
+
 <ol>
-  <li>tmpfs使用物理内存与交换空间，默认50%内存＋交换空间大小，可指定文件系统大小</li>
-  <li>文件写入超出指定大小会无法写入，与向一个磁盘写数据直到超出磁盘容量情况相同</li>
-  <li>手动删除文件可释放空间</li>
+  <li>用户Home目录权限应为755/644组成员与其他人不可拥有写入权限</li>
+  <li>.ssh目录权限应为700</li>
 </ol>
 
-<p>例子：</p>
-
-<p>如有200M大小tmpfs，先写入test1 150M后写入test2 100M 最后test2只有部分写入，test2实际文件大小50M文件被部分截断</p>
-
-<p>可使用下面命令挂载tmpfs，<em>-o size=200m</em> 参数用于指定文件最大容量,大小可使用k,m,g指定</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>mount -t tmpfs tmpfs /ramtest -o size=200m
-</code></pre>
-</div>
-
-<h3 id="section">参考资料</h3>
-
-<blockquote>
-  <p><a href="https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt">https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt</a></p>
-</blockquote>
+<p>很多时候出问题的地方在用户Home目录，.ssh目录可用ssh-keygen命令生成，一般问题不大</p>
 
         </section>
 
         <footer>
             
-            <a href="/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html" class="float-left">&larr; Previous</a> 
+            <a href="/2016/04/27/Linux-ramfs%E4%B8%8Etmpfs%E6%AF%94%E8%BE%83.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html" class="float-right">Next &rarr;</a> 
+            <a href="/2016/05/04/FreeBSD%E5%85%A5%E9%97%A8.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 
@@ -119,7 +99,7 @@ mount -t ramfs ramfs /ramtest
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
             <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/04/27/Linux ramfs与tmpfs比较" data-title="Linux ramfs与tmpfs比较" data-url="http://louguanstar.com//2016/04/27/Linux-ramfs%E4%B8%8Etmpfs%E6%AF%94%E8%BE%83.html"></div>
+                <div class="ds-thread" data-thread-key="/2016/05/03/SSH一些技巧与注意事项" data-title="Ssh一些技巧与注意事项" data-url="http://louguanstar.com//2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">

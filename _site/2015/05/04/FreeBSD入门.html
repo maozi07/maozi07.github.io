@@ -57,59 +57,51 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Linux ramfs与tmpfs比较</h2>
-                <p class="post-meta">Apr 27, 2016</p>
+            <h2>Freebsd入门</h2>
+                <p class="post-meta">May 4, 2015</p>
         </header>
 
         <section class="post-content">
-            <h4 id="ramfstmpfs">ramfs与tmpfs都可挂载内存为硬盘上的目录，通俗的就是内存当作磁盘使用</h4>
+            <p>FreeBSD作为一款Unix操作表现出强大的稳定性与安全性，乔布斯曾挖走FreeBSD的创始人去开发Mac OSX所依两者有很多相似的地方。个人使用感觉两者的稳定性比起Linux要优秀很多。今日闲来无事就在虚拟机上体验了下。</p>
 
-<h3 id="ramfs">ramfs</h3>
+<h3 id="section">软件管理</h3>
+
+<p>首先直接跳过了操作系统的安装，说实话对于一个熟悉Linux的人来说，FreeBSD的安装不会有什么大的问题。FreeBSD／OSX包含的工作也很多与Linux相同，这也是为什么很多码农喜欢用Mac的原因之一吧。</p>
+
+<h4 id="pkgpackagesport">pkg(packages)与port</h4>
+
+<p>packages与port都为FreeBSD下安装程序的工具，packages用来安装二进制包，ports使用源码来安装程序。两者都可以处理包的依赖关系，使用packages或port来安装应用时都会安装有相应依赖关系的程序或者库。以下为两者的一些主要区别：</p>
+
 <ol>
-  <li>ramfs制使用物理内存，挂载时不可限制大小</li>
-  <li>写入的文件都会保存在内存中，内存耗尽时Linux系统会触发OOM killer（Out Of Memory killer）</li>
-  <li>手动删除文件可释放空间</li>
+  <li>一个压缩过的二进制安装包通常比一个包含源码的包小</li>
+  <li>Packages不需要额外的编译时间，对于大的应用比如：FireFox，KED，GNOME编译会比较久</li>
+  <li>使用port编译时可以添加一些编译选项，比如编译Apache可以指定包含哪些模块，二进制包能包含大多数情况</li>
+  <li>有些许可禁止使用二进制包分发</li>
+  <li>有人可能觉得二进制包不安全或者喜欢通过阅读源码去解决一些问题</li>
+  <li>源码对自己打补丁很有用</li>
 </ol>
 
-<p>因此使用时要特别小心以防触发OOM killer，OOM killer触发时系统会很卡接近死机，停止向内存中写数据系统会慢慢恢复</p>
+<p>最新的FreeBSD已经抛弃老的pkg工作，老式的系统安装软件使用pkg_add，现在的则是pkg install。在最近的FreeBSD中pkg与yum／apt这类工具更相似，使得FreeBSD下安装软件更容易。不过由于FreeBSD最近才切换到新的pkg，所以如果你使用的FreeBSD10.X（9.X未验证，8.X都是老的pkg）就可以方便的使用pkg，不过由于这个比较新所以国内没有可用的pkg源，包括阿里、中科大等都没有源可用，国内使用体验很是不好（全球官方列出的源也不超过10个）。</p>
 
-<p>可使用下面命令将内存挂在为硬盘上一个文件使用：</p>
+<h4 id="pkg">pkg使用</h4>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>mkdir /ramtest
-mount -t ramfs ramfs /ramtest
-</code></pre>
-</div>
-
-<h3 id="tmpfs">tmpfs</h3>
 <ol>
-  <li>tmpfs使用物理内存与交换空间，默认50%内存＋交换空间大小，可指定文件系统大小</li>
-  <li>文件写入超出指定大小会无法写入，与向一个磁盘写数据直到超出磁盘容量情况相同</li>
-  <li>手动删除文件可释放空间</li>
+  <li>查找软件<code class="highlighter-rouge">pkg search package_name</code></li>
+  <li>安装软件<code class="highlighter-rouge">pkg install package_name</code></li>
 </ol>
 
-<p>例子：</p>
-
-<p>如有200M大小tmpfs，先写入test1 150M后写入test2 100M 最后test2只有部分写入，test2实际文件大小50M文件被部分截断</p>
-
-<p>可使用下面命令挂载tmpfs，<em>-o size=200m</em> 参数用于指定文件最大容量,大小可使用k,m,g指定</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>mount -t tmpfs tmpfs /ramtest -o size=200m
-</code></pre>
-</div>
-
-<h3 id="section">参考资料</h3>
-
+<h3 id="section-1">参考文档与相关链接</h3>
 <blockquote>
-  <p><a href="https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt">https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt</a></p>
+  <p>FreeBSD的官方文档还是很齐全的，需要什么都可以去官网找到，绝对应用尽有
+<a href="ftp://ftp.cn.freebsd.org/pub/FreeBSD/">官方FTP中国站点：ftp://ftp.cn.freebsd.org/pub/FreeBSD/</a></p>
 </blockquote>
 
         </section>
 
         <footer>
             
-            <a href="/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html" class="float-right">Next &rarr;</a> 
+            <a href="/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 
@@ -119,7 +111,7 @@ mount -t ramfs ramfs /ramtest
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
             <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/04/27/Linux ramfs与tmpfs比较" data-title="Linux ramfs与tmpfs比较" data-url="http://louguanstar.com//2016/04/27/Linux-ramfs%E4%B8%8Etmpfs%E6%AF%94%E8%BE%83.html"></div>
+                <div class="ds-thread" data-thread-key="/2015/05/04/FreeBSD入门" data-title="Freebsd入门" data-url="http://louguanstar.com//2015/05/04/FreeBSD%E5%85%A5%E9%97%A8.html"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">

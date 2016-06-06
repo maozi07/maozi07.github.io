@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+
+<html>
+    
+	<head>
+		<title>Louguan Star's Blog</title>
+		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="baidu-site-verification" content="TXUGY4f1Fu" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<!--[if lte IE 8]><script src="css/ie/html5shiv.js"></script><![endif]-->
+		<script src="/js/jquery.min.js"></script>
+		<script src="/js/jquery.scrollzer.min.js"></script>
+		<script src="/js/jquery.scrolly.min.js"></script>
+		<script src="/js/skel.min.js"></script>
+		<script src="/js/skel-layers.min.js"></script>
+		<script src="/js/init.js"></script>
+		<noscript>
+			<link rel="stylesheet" href="/css/skel.css" />
+			<link rel="stylesheet" href="/css/style.css" />
+			<link rel="stylesheet" href="/css/style-xlarge.css" />
+		</noscript>
+		<!--[if lte IE 8]><link rel="stylesheet" href="css/ie/v8.css" /><![endif]-->
+	</head>
+
+    <body>
+        <div id="wrapper">
+        <!-- Header -->
+    <section id="header" class="skel-layers-fixed">
+        <header>
+            <span class="image avatar"><img src="/images/avatar.jpg" alt="" /></span>
+            <h1 id="logo"><a href="/">Louguan Star</a></h1>
+            <p>心之安处，便是吾乡...</p>
+        </header>
+        <nav id="nav">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </nav>
+        <footer>
+            <ul class="icons">
+                <!-- <li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li> -->
+                <!-- <li><a href="#" class="icon fa-facebook"><span class="label">Facebook</span></a></li> -->
+                <!-- <li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li> -->
+                <li><a href="https://github.com/maozi07" class="icon fa-github"><span class="label">Github</span></a></li>
+                <li><a href="#" class="icon fa-envelope"><span class="label">Email</span></a></li>
+            </ul>
+        </footer>
+    </section>
+
+
+            <!-- Main -->
+            <div id="main">
+                <section>
+    <div class="container">
+        <header class="major">
+            <h2>Bash的中括号高级特性</h2>
+                <p class="post-meta">May 16, 2016</p>
+        </header>
+
+        <section class="post-content">
+            <p>本文主要详细介绍Bash中{}的详细用法，由于Bash中的变量类型只有字符串故下文字符串与变量同指代Bash中的变量，部分配有例子。</p>
+
+<h3 id="section">字符串基本</h3>
+<p>string=1234.123</p>
+
+<ul>
+  <li>分隔变量与字符串</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>echo ${string}1    #1234.1231
+</code></pre>
+</div>
+<ul>
+  <li>${#string}统计变量字符串长度</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>echo ${#string}    #8
+</code></pre>
+</div>
+<ul>
+  <li>${string:start:length}截取字符串，从第start个字符开始共length个字符</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>echo ${string:7:1}    #3
+echo ${string:(-4)}    #.123
+</code></pre>
+</div>
+<p>### 字符串匹配切片（可用来踢去文件后缀，文件路径等）
+- ${string#substring}删除最先匹配到的字符（substring）的左边
+- ${string##substring}删除最后匹配到的字符（substring）的左边</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>stringZ=abcABC123ABCabc
+#删除最先匹配的左边
+echo ${stringZ#a*C}   #123ABCabc
+#删除最后匹配到的左边
+echo ${stringZ##a*C}   #abc
+</code></pre>
+</div>
+<ul>
+  <li>${string%substring}从string后边开始匹配，删除最先匹配到（substring）的右边</li>
+  <li>${string%%substring}从string后边开始匹配，删除最后匹配到（substring）的右边</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>string=abcABC123ABCabc
+echo ${string%abc}    #abcABC123ABC
+echo ${string%%A*}    #abc
+</code></pre>
+</div>
+
+<p>注意<code class="highlighter-rouge">本小节中的substring必须为全匹配</code>，所以例子中才会出现通配符*，如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>string=abcABC123ABCabc
+echo ${string##123}    #abcABC123ABCabc
+echo ${string%%123}    #abcABC123ABCabc
+</code></pre>
+</div>
+
+<h3 id="section-1">字符串替换</h3>
+<ul>
+  <li>${string/substring/replacement}    将第一个匹配到的substring替换为replacement</li>
+  <li>${string//substring/replacement}    将所有匹配到的substring替换为replacement</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>string=abcABC123ABCabc
+echo ${string/abc/xyz}    #xyzABC123ABCabc
+echo ${string//abc/xyz}    #xyzABC123ABCxyz
+</code></pre>
+</div>
+<ul>
+  <li>${string/#substring/replacement}   将字符串开始匹配（全匹配）到的第一个substring用replacement替换</li>
+  <li>${string/%substring/replacement}   从字符串末尾开始匹配，将第一个匹配（全匹配）到的substring用replacement替换</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>string=abcABC123ABCabc
+echo ${string/#a*c/xyz}    #xyz
+echo ${string/%abc/xyz}    #abcABC123ABCxyz
+</code></pre>
+</div>
+
+<h3 id="section-2">变量判断</h3>
+<ul>
+  <li>${parameter-default}, ${parameter:-default}</li>
+</ul>
+
+<p>如果变量parameter没有赋值，default最为parameter默认值，:的区别在于变量parameter已经被声明但是null</p>
+
+<ul>
+  <li>${parameter=default}, ${parameter:=default}</li>
+</ul>
+
+<p>如果变量parameter没有声明，default最为parameter默认值，:的区别在于变量parameter已经被声明但是null</p>
+
+<ul>
+  <li>${parameter+alt_value}, ${parameter:+alt_value}</li>
+</ul>
+
+<p>如果变量parameter已经设定，使用alt_value，否则使用null</p>
+
+<ul>
+  <li>${parameter?err_msg}, ${parameter:?err_msg}，:的区别在于变量parameter已经被声明但是null</li>
+</ul>
+
+<p>如果变量parameter已经设定，使用变量，否则打印err_msg退出脚本返回状态码1</p>
+
+<h3 id="section-3">参考文档与相关链接</h3>
+<blockquote>
+  <ol>
+    <li><a href="http://www.tldp.org/LDP/abs/abs-guide.pdf">Advanced Bash-Scripting Guide</a></li>
+  </ol>
+</blockquote>
+
+        </section>
+
+        <footer>
+            
+            <a href="/2016/05/04/FreeBSD%E5%85%A5%E9%97%A8.html" class="float-left">&larr; Previous</a> 
+            
+            <a href="/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html" class="float-right">Next &rarr;</a> 
+
+        </footer>
+
+        <div id="footer" class="copyright">
+            <ul class="copyright">
+                <li>本文系原创，转载请注明：转自<a target="_blank" href="http://www.louguanstar.com">LouguanStar's Blog</a>，作者：<a target="_blank" href="http://wwww.louguanstar.com/about/">LouguanStar</a></li>
+                <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
+            </ul>
+            <!-- 多说评论框 start -->
+                <div class="ds-thread" data-thread-key="/2016/05/16/Bash的中括号高级特性" data-title="Bash的中括号高级特性" data-url="http://louguanstar.com//2016/05/16/Bash%E7%9A%84%E4%B8%AD%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html"></div>
+            <!-- 多说评论框 end -->
+            <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+            <script type="text/javascript">
+            var duoshuoQuery = {short_name:"louguanstar"};
+                (function() {
+                    var ds = document.createElement('script');
+                    ds.type = 'text/javascript';ds.async = true;
+                    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                    ds.charset = 'UTF-8';
+                    (document.getElementsByTagName('head')[0]
+                     || document.getElementsByTagName('body')[0]).appendChild(ds);
+                })();
+            </script>
+            <!-- 多说公共JS代码 end -->
+        </div>
+
+    </div>
+
+</section>
+
+
+            </div>
+            <!-- Footer -->
+    <section id="footer">
+        <div class="container">
+            <ul class="copyright">
+                <li>&copy;2016&nbsp;Louguan Star. &nbsp;All rights reserved.&nbsp;Powered by jekyll.</li>
+            </ul>
+        </div>
+    </section>
+
+		</div>
+	</body>
+</html>

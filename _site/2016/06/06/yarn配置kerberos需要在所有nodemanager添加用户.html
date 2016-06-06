@@ -57,59 +57,64 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Linux ramfs与tmpfs比较</h2>
-                <p class="post-meta">Apr 27, 2016</p>
+            <h2>Yarn配置kerberos需要在所有nodemanager添加用户</h2>
+                <p class="post-meta">Jun 6, 2016</p>
         </header>
 
         <section class="post-content">
-            <h4 id="ramfstmpfs">ramfs与tmpfs都可挂载内存为硬盘上的目录，通俗的就是内存当作磁盘使用</h4>
+            <p>yarn添加kerberos认证需要在所有nodemanager上添加kerberos principal用户</p>
 
-<h3 id="ramfs">ramfs</h3>
-<ol>
-  <li>ramfs制使用物理内存，挂载时不可限制大小</li>
-  <li>写入的文件都会保存在内存中，内存耗尽时Linux系统会触发OOM killer（Out Of Memory killer）</li>
-  <li>手动删除文件可释放空间</li>
-</ol>
+<h3 id="section">发现问题</h3>
 
-<p>因此使用时要特别小心以防触发OOM killer，OOM killer触发时系统会很卡接近死机，停止向内存中写数据系统会慢慢恢复</p>
+<p>同事反应yarn提交任务有问题，发现yarn配置了kerberos认证，于是给新建的用户添加了principal，并且生成了keytab</p>
 
-<p>可使用下面命令将内存挂在为硬盘上一个文件使用：</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>添加principal
+kadmin.local -q "addprinc -randkey spark_deploy@LOUGUANSTAR.COM"
+生成keytab
+kadmin.local -q "ktadd -k spark_deploy.keytab spark_deploy@LOUGUANSTAR.COM"
 
-<div class="highlighter-rouge"><pre class="highlight"><code>mkdir /ramtest
-mount -t ramfs ramfs /ramtest
+其他kerberos操作：
+删除principal
+kadmin.local -q "delprinc spark_deploy@LOUGUANSTAR.COM"
+查看所有principal
+./kadmin.local -q "listprincs" | grep spark
 </code></pre>
 </div>
 
-<h3 id="tmpfs">tmpfs</h3>
-<ol>
-  <li>tmpfs使用物理内存与交换空间，默认50%内存＋交换空间大小，可指定文件系统大小</li>
-  <li>文件写入超出指定大小会无法写入，与向一个磁盘写数据直到超出磁盘容量情况相同</li>
-  <li>手动删除文件可释放空间</li>
-</ol>
+<p>然后进行kerberos认证，尝试提交任务</p>
 
-<p>例子：</p>
-
-<p>如有200M大小tmpfs，先写入test1 150M后写入test2 100M 最后test2只有部分写入，test2实际文件大小50M文件被部分截断</p>
-
-<p>可使用下面命令挂载tmpfs，<em>-o size=200m</em> 参数用于指定文件最大容量,大小可使用k,m,g指定</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>mount -t tmpfs tmpfs /ramtest -o size=200m
+<div class="highlighter-rouge"><pre class="highlight"><code>kinit -kt spark_deploy.keytab spark_deploy
+hadoop jar  /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.5.2.jar pi 10 100
 </code></pre>
 </div>
+<p>任务很快结束，jobhistory中找不到日志，resourcemanager中的报错信息很简短，错误信息大致如下：</p>
 
-<h3 id="section">参考资料</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>main : run as user is spark_deploy
+main : requested yarn user is spark_deploy
+User spark_deploy not found
+</code></pre>
+</div>
+<p>### 解决问题</p>
+
+<p>始终觉得问题在设置yarn.nodemanager.linux-container-executor的问题上，如果没有设置kerberos认证那么可以指定运行yarn.nodemanager.linux-container-executor；配置了kerberos之后yarn任务的用户为kerberos principal中的用户如：spark_deploy@LOUGUANSTAR.COM中即为spark_deploy
+经历了多半天各种调试，最后发现：<code class="highlighter-rouge">配置kerberos之后必须在每个nodemanager上新建kerberos principal中的用户</code>，这样才能确保每个任务都可以在nodemanager上运行</p>
+
+<p>在所有nodemanager上添加spark_deploy用户，问题成功解决</p>
+
+<h3 id="section-1">参考文档</h3>
 
 <blockquote>
-  <p><a href="https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt">https://www.kernel.org/doc/Documentation/filesystems/ramfs-rootfs-initramfs.txt</a></p>
+  <ol>
+    <li><a href="https://community.cloudera.com/t5/Batch-Processing-and-Workflow/YARN-force-nobody-user-on-all-jobs-and-so-they-fail/td-p/26050">https://community.cloudera.com/t5/Batch-Processing-and-Workflow/YARN-force-nobody-user-on-all-jobs-and-so-they-fail/td-p/26050</a></li>
+  </ol>
 </blockquote>
 
         </section>
 
         <footer>
             
-            <a href="/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html" class="float-left">&larr; Previous</a> 
+            <a href="/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 
@@ -119,7 +124,7 @@ mount -t ramfs ramfs /ramtest
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
             <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/04/27/Linux ramfs与tmpfs比较" data-title="Linux ramfs与tmpfs比较" data-url="http://louguanstar.com//2016/04/27/Linux-ramfs%E4%B8%8Etmpfs%E6%AF%94%E8%BE%83.html"></div>
+                <div class="ds-thread" data-thread-key="/2016/06/06/yarn配置kerberos需要在所有nodemanager添加用户" data-title="Yarn配置kerberos需要在所有nodemanager添加用户" data-url="http://louguanstar.com//2016/06/06/yarn%E9%85%8D%E7%BD%AEkerberos%E9%9C%80%E8%A6%81%E5%9C%A8%E6%89%80%E6%9C%89nodemanager%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7.html"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">
