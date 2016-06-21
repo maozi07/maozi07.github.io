@@ -1,0 +1,77 @@
+---
+layout: post
+---
+
+### 使用awk的NR与FNR合并两个文件
+工作遇到一个需求有如下两个文件：
+
+- file a
+
+```
+store.louguanstar.com	5.6.7.8
+app.louguanstar.com	1.2.3.4
+foo.louguanstar.com	a.b.c.d
+```
+
+- file b
+
+```
+foo.louguanstar.com	1300
+store.louguanstar.com	1100
+app.louguanstar.com	1200
+```
+
+现在需要把这个文件处理为如下样式然后加上xml文件头就行，用作hadoop集群的topology文件
+
+```
+<node name="foo.louguanstar.com" rack="/avatar/1300"/>
+<node name="a.b.c.d" rack="/avatar/1300"/>
+<node name="store.louguanstar.com" rack="/avatar/1100"/>
+<node name="5.6.7.8" rack="/avatar/1100"/>
+<node name="app.louguanstar.com" rack="/avatar/1200"/>
+<node name="1.2.3.4" rack="/avatar/1200"/>
+```
+
+
+awk可以使用自身变量NR和FNR来处理多个文件。
+
+NR：awk开始执行程序后所读取的数据行数。
+
+FNR：awk当前读取的记录数，FNR值小于等于NR（当awk读取第二个文件时，FNR是从0开始重新计数，而NR继续累加）。
+
+NR==FNR：用于在读取两个或两个以上的文件时，判断是不是在读取第一个文件。
+
+awk处理多个文件的基本语法是:
+awk -F分隔符 'BEGIN { 初始化 } { 循环执行部分 } END { 结束处理 }' file1 file2
+
+其中BEGIN和END可以省略，-F用来指定分割符
+
+最后使用如下命令就可以得到上面的结果：
+
+```
+awk 'NR==FNR{a[$1]=$2}FNR<NR{print $1,a[$1],$2}' a b | awk '{print "<node name=\""$1"\" rack=\"/avatar/"$3"\"/>\n<node name=\""$2"\" rack=\"/avatar/"$3"\"/>"}'
+```
+
+后面又发现使用awk可以统计每块网卡的网速，命令如下：
+
+```
+tmp1=`mktemp`
+tmp2=`mktemp`
+/bin/cat /proc/net/dev | awk 'NR>2 {print $1" tx "$2" ,rx "$10}' |sed 's/://' >$tmp1
+sleep 5
+/bin/cat /proc/net/dev | awk 'NR>2 {print $1" tx "$2" ,rx "$10}' |sed 's/://' >$tmp2
+
+echo ",
+    \"band_width_out\":{"
+awk 'NR==FNR{a[$1]=$3}NR>FNR{print "        \""$1"\":\""($3-a[$1])/5/1024"MB/s\","}' $tmp1 $tmp2
+
+echo "    },
+    \"band_width_in\":{"
+awk 'NR==FNR{a[$1]=$NF}NR>FNR{print "        \""$1"\":\"" ($NF-a[$1])/5/1024"MB/s\","}' $tmp1 $tmp2
+echo "    }"
+rm $tmp1 $tmp2
+```
+
+### 参考文档
+
+> 1. [http://blog.csdn.net/imzoer/article/details/8734474](http://blog.csdn.net/imzoer/article/details/8734474)
