@@ -34,6 +34,7 @@ main : run as user is spark_deploy
 main : requested yarn user is spark_deploy
 User spark_deploy not found
 ```
+
 ### 解决问题
 
 始终觉得问题在设置yarn.nodemanager.linux-container-executor的问题上，如果没有设置kerberos认证那么可以指定运行yarn.nodemanager.linux-container-executor；配置了kerberos之后yarn任务的用户为kerberos principal中的用户如：spark_deploy@LOUGUANSTAR.COM中即为spark_deploy
