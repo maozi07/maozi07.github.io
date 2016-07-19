@@ -6,9 +6,175 @@
 </description>
     <link>http://louguanstar.com/</link>
     <atom:link href="http://louguanstar.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 06 Jun 2016 20:32:39 +0800</pubDate>
-    <lastBuildDate>Mon, 06 Jun 2016 20:32:39 +0800</lastBuildDate>
+    <pubDate>Tue, 19 Jul 2016 22:57:27 +0800</pubDate>
+    <lastBuildDate>Tue, 19 Jul 2016 22:57:27 +0800</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
+    
+      <item>
+        <title>关于yum的变量</title>
+        <description>&lt;p&gt;使用yum安装软件的Linux发行版，其关于yum源的配置一般如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[base]
+name=CentOS-$releasever - Base - 163.com
+baseurl=http://mirrors.163.com/centos/$releasever/os/$basearch/
+#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&amp;amp;arch=$basearch&amp;amp;repo=os
+gpgcheck=1
+gpgkey=http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-6
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;其中出现了&lt;code class=&quot;highlighter-rouge&quot;&gt;$releasever&lt;/code&gt; , &lt;code class=&quot;highlighter-rouge&quot;&gt;$basearch&lt;/code&gt;这两个变量，于是搜索资料学习了下&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;查看变量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;可用如下命令查看yum中的变量&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; python -c &#39;import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)&#39;
+
+ 输出如下：
+ Loaded plugins: fastestmirror
+ {&#39;arch&#39;: &#39;ia32e&#39;,
+  &#39;basearch&#39;: &#39;x86_64&#39;,
+  &#39;releasever&#39;: &#39;6&#39;,
+  &#39;uuid&#39;: &#39;d9361a3a-ca57-4c50-989d-7c5e09dba049&#39;}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Ubuntu中的apt源配置文件样例&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;相比与yum，apt的源配置文件大致如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ubuntu:
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;yum中两个相同软件名只有版本不同&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;今天同样遇到一个问题，用yum查看安装的软件时发现有两个完全一样的软件，可用如下方式处理&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;yum list installed | grep datanode
+hadoop-hdfs-datanode.x86_64    cdh5.5.0************
+hadoop-hdfs-datanode.x86_64    cdh5.2.0************
+
+处理方式：
+
+sudo rpm -ev --noscripts --allmatches hadoop-hdfs-datanode
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Tue, 19 Jul 2016 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2016/07/19/%E5%85%B3%E4%BA%8Eyum%E7%9A%84%E5%8F%98%E9%87%8F.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2016/07/19/%E5%85%B3%E4%BA%8Eyum%E7%9A%84%E5%8F%98%E9%87%8F.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Awk使用nr与fnr合并两个文件</title>
+        <description>&lt;h3 id=&quot;awknrfnr&quot;&gt;使用awk的NR与FNR合并两个文件&lt;/h3&gt;
+&lt;p&gt;工作遇到一个需求有如下两个文件：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;file a&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;store.louguanstar.com	5.6.7.8
+app.louguanstar.com	1.2.3.4
+foo.louguanstar.com	a.b.c.d
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;file b&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;foo.louguanstar.com	1300
+store.louguanstar.com	1100
+app.louguanstar.com	1200
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;现在需要把这个文件处理为如下样式然后加上xml文件头就行，用作hadoop集群的topology文件&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;node name=&quot;foo.louguanstar.com&quot; rack=&quot;/avatar/1300&quot;/&amp;gt;
+&amp;lt;node name=&quot;a.b.c.d&quot; rack=&quot;/avatar/1300&quot;/&amp;gt;
+&amp;lt;node name=&quot;store.louguanstar.com&quot; rack=&quot;/avatar/1100&quot;/&amp;gt;
+&amp;lt;node name=&quot;5.6.7.8&quot; rack=&quot;/avatar/1100&quot;/&amp;gt;
+&amp;lt;node name=&quot;app.louguanstar.com&quot; rack=&quot;/avatar/1200&quot;/&amp;gt;
+&amp;lt;node name=&quot;1.2.3.4&quot; rack=&quot;/avatar/1200&quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;awk可以使用自身变量NR和FNR来处理多个文件。&lt;/p&gt;
+
+&lt;p&gt;NR：awk开始执行程序后所读取的数据行数。&lt;/p&gt;
+
+&lt;p&gt;FNR：awk当前读取的记录数，FNR值小于等于NR（当awk读取第二个文件时，FNR是从0开始重新计数，而NR继续累加）。&lt;/p&gt;
+
+&lt;p&gt;NR==FNR：用于在读取两个或两个以上的文件时，判断是不是在读取第一个文件。&lt;/p&gt;
+
+&lt;p&gt;awk处理多个文件的基本语法是:
+awk -F分隔符 ‘BEGIN { 初始化 } { 循环执行部分 } END { 结束处理 }’ file1 file2&lt;/p&gt;
+
+&lt;p&gt;其中BEGIN和END可以省略，-F用来指定分割符&lt;/p&gt;
+
+&lt;p&gt;最后使用如下命令就可以得到上面的结果：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;awk &#39;NR==FNR{a[$1]=$2}FNR&amp;lt;NR{print $1,a[$1],$2}&#39; a b | awk &#39;{print &quot;&amp;lt;node name=\&quot;&quot;$1&quot;\&quot; rack=\&quot;/avatar/&quot;$3&quot;\&quot;/&amp;gt;\n&amp;lt;node name=\&quot;&quot;$2&quot;\&quot; rack=\&quot;/avatar/&quot;$3&quot;\&quot;/&amp;gt;&quot;}&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;后面又发现使用awk可以统计每块网卡的网速，命令如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;tmp1=`mktemp`
+tmp2=`mktemp`
+/bin/cat /proc/net/dev | awk &#39;NR&amp;gt;2 {print $1&quot; tx &quot;$2&quot; ,rx &quot;$10}&#39; |sed &#39;s/://&#39; &amp;gt;$tmp1
+sleep 5
+/bin/cat /proc/net/dev | awk &#39;NR&amp;gt;2 {print $1&quot; tx &quot;$2&quot; ,rx &quot;$10}&#39; |sed &#39;s/://&#39; &amp;gt;$tmp2
+
+echo &quot;,
+    \&quot;band_width_out\&quot;:{&quot;
+awk &#39;NR==FNR{a[$1]=$3}NR&amp;gt;FNR{print &quot;        \&quot;&quot;$1&quot;\&quot;:\&quot;&quot;($3-a[$1])/5/1024&quot;MB/s\&quot;,&quot;}&#39; $tmp1 $tmp2
+
+echo &quot;    },
+    \&quot;band_width_in\&quot;:{&quot;
+awk &#39;NR==FNR{a[$1]=$NF}NR&amp;gt;FNR{print &quot;        \&quot;&quot;$1&quot;\&quot;:\&quot;&quot; ($NF-a[$1])/5/1024&quot;MB/s\&quot;,&quot;}&#39; $tmp1 $tmp2
+echo &quot;    }&quot;
+rm $tmp1 $tmp2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;参考文档&lt;/h3&gt;
+
+&lt;blockquote&gt;
+  &lt;ol&gt;
+    &lt;li&gt;&lt;a href=&quot;http://blog.csdn.net/imzoer/article/details/8734474&quot;&gt;http://blog.csdn.net/imzoer/article/details/8734474&lt;/a&gt;&lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Tue, 21 Jun 2016 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Yarn配置kerberos需要在所有nodemanager添加用户</title>
@@ -44,14 +210,15 @@ main : requested yarn user is spark_deploy
 User spark_deploy not found
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;### 解决问题&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;解决问题&lt;/h3&gt;
 
 &lt;p&gt;始终觉得问题在设置yarn.nodemanager.linux-container-executor的问题上，如果没有设置kerberos认证那么可以指定运行yarn.nodemanager.linux-container-executor；配置了kerberos之后yarn任务的用户为kerberos principal中的用户如：spark_deploy@LOUGUANSTAR.COM中即为spark_deploy
 经历了多半天各种调试，最后发现：&lt;code class=&quot;highlighter-rouge&quot;&gt;配置kerberos之后必须在每个nodemanager上新建kerberos principal中的用户&lt;/code&gt;，这样才能确保每个任务都可以在nodemanager上运行&lt;/p&gt;
 
 &lt;p&gt;在所有nodemanager上添加spark_deploy用户，问题成功解决&lt;/p&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;参考文档&lt;/h3&gt;
+&lt;h3 id=&quot;section-2&quot;&gt;参考文档&lt;/h3&gt;
 
 &lt;blockquote&gt;
   &lt;ol&gt;
@@ -120,7 +287,7 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具&lt;/p&gt
       </item>
     
       <item>
-        <title>Bash的中括号高级特性</title>
+        <title>Bash的大括号高级特性</title>
         <description>&lt;p&gt;本文主要详细介绍Bash中{}的详细用法，由于Bash中的变量类型只有字符串故下文字符串与变量同指代Bash中的变量，部分配有例子。&lt;/p&gt;
 
 &lt;h3 id=&quot;section&quot;&gt;字符串基本&lt;/h3&gt;
@@ -148,9 +315,12 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具&lt;/p&gt
 echo ${string:(-4)}    #.123
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
-&lt;p&gt;### 字符串匹配切片（可用来踢去文件后缀，文件路径等）
-- ${string#substring}删除最先匹配到的字符（substring）的左边
-- ${string##substring}删除最后匹配到的字符（substring）的左边&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;字符串匹配切片（可用来踢去文件后缀，文件路径等）&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;${string#substring}删除最先匹配到的字符（substring）的左边&lt;/li&gt;
+  &lt;li&gt;${string##substring}删除最后匹配到的字符（substring）的左边&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;stringZ=abcABC123ABCabc
 #删除最先匹配的左边
@@ -178,7 +348,7 @@ echo ${string%%123}    #abcABC123ABCabc
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;字符串替换&lt;/h3&gt;
+&lt;h3 id=&quot;section-2&quot;&gt;字符串替换&lt;/h3&gt;
 &lt;ul&gt;
   &lt;li&gt;${string/substring/replacement}    将第一个匹配到的substring替换为replacement&lt;/li&gt;
   &lt;li&gt;${string//substring/replacement}    将所有匹配到的substring替换为replacement&lt;/li&gt;
@@ -200,7 +370,7 @@ echo ${string/%abc/xyz}    #abcABC123ABCxyz
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h3 id=&quot;section-2&quot;&gt;变量判断&lt;/h3&gt;
+&lt;h3 id=&quot;section-3&quot;&gt;变量判断&lt;/h3&gt;
 &lt;ul&gt;
   &lt;li&gt;${parameter-default}, ${parameter:-default}&lt;/li&gt;
 &lt;/ul&gt;
@@ -225,7 +395,7 @@ echo ${string/%abc/xyz}    #abcABC123ABCxyz
 
 &lt;p&gt;如果变量parameter已经设定，使用变量，否则打印err_msg退出脚本返回状态码1&lt;/p&gt;
 
-&lt;h3 id=&quot;section-3&quot;&gt;参考文档与相关链接&lt;/h3&gt;
+&lt;h3 id=&quot;section-4&quot;&gt;参考文档与相关链接&lt;/h3&gt;
 &lt;blockquote&gt;
   &lt;ol&gt;
     &lt;li&gt;&lt;a href=&quot;http://www.tldp.org/LDP/abs/abs-guide.pdf&quot;&gt;Advanced Bash-Scripting Guide&lt;/a&gt;&lt;/li&gt;
@@ -233,8 +403,8 @@ echo ${string/%abc/xyz}    #abcABC123ABCxyz
 &lt;/blockquote&gt;
 </description>
         <pubDate>Mon, 16 May 2016 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2016/05/16/Bash%E7%9A%84%E4%B8%AD%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2016/05/16/Bash%E7%9A%84%E4%B8%AD%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html</guid>
+        <link>http://louguanstar.com/2016/05/16/Bash%E7%9A%84%E5%A4%A7%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2016/05/16/Bash%E7%9A%84%E5%A4%A7%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html</guid>
         
         
       </item>
@@ -362,18 +532,6 @@ mount -t ramfs ramfs /ramtest
         <pubDate>Wed, 27 Apr 2016 00:00:00 +0800</pubDate>
         <link>http://louguanstar.com/2016/04/27/Linux-ramfs%E4%B8%8Etmpfs%E6%AF%94%E8%BE%83.html</link>
         <guid isPermaLink="true">http://louguanstar.com/2016/04/27/Linux-ramfs%E4%B8%8Etmpfs%E6%AF%94%E8%BE%83.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>近来来的感受</title>
-        <description>&lt;p&gt;毕业近一年，一直都比较迷茫，对于前途对于未来有些不知所措，看着别人的工资，想着自己的前途，不知道未来在哪儿…还好身边一直有个人，虽然时不时会不愉快。
-刚刚换了工作，以外包的身份在联想工作，虽然有不好但工资不错更重要的是这对于个人来说也是一个机遇。快一年了，积蓄一直是负数，东西买了一大堆可是总觉得心中不踏实。趁着在联想这边工作，好好学些知识，关于大数据的、关于自动化运维的、继续好好熟悉Bash与Python，积攒一些积蓄。来年或者一段时间之后再回来看看，回顾回顾，在此做个记录。&lt;/p&gt;
-</description>
-        <pubDate>Mon, 25 Apr 2016 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2016/04/25/%E8%BF%91%E6%9D%A5%E6%9D%A5%E7%9A%84%E6%84%9F%E5%8F%97.html</guid>
         
         
       </item>

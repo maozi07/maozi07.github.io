@@ -94,14 +94,15 @@ main : requested yarn user is spark_deploy
 User spark_deploy not found
 </code></pre>
 </div>
-<p>### 解决问题</p>
+
+<h3 id="section-1">解决问题</h3>
 
 <p>始终觉得问题在设置yarn.nodemanager.linux-container-executor的问题上，如果没有设置kerberos认证那么可以指定运行yarn.nodemanager.linux-container-executor；配置了kerberos之后yarn任务的用户为kerberos principal中的用户如：spark_deploy@LOUGUANSTAR.COM中即为spark_deploy
 经历了多半天各种调试，最后发现：<code class="highlighter-rouge">配置kerberos之后必须在每个nodemanager上新建kerberos principal中的用户</code>，这样才能确保每个任务都可以在nodemanager上运行</p>
 
 <p>在所有nodemanager上添加spark_deploy用户，问题成功解决</p>
 
-<h3 id="section-1">参考文档</h3>
+<h3 id="section-2">参考文档</h3>
 
 <blockquote>
   <ol>
@@ -115,6 +116,7 @@ User spark_deploy not found
             
             <a href="/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html" class="float-left">&larr; Previous</a> 
             
+            <a href="/2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 

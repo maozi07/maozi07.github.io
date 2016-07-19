@@ -1,0 +1,68 @@
+---
+layout: post
+---
+
+使用yum安装软件的Linux发行版，其关于yum源的配置一般如下
+
+```
+[base]
+name=CentOS-$releasever - Base - 163.com
+baseurl=http://mirrors.163.com/centos/$releasever/os/$basearch/
+#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os
+gpgcheck=1
+gpgkey=http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-6
+
+```
+
+其中出现了`$releasever` , `$basearch`这两个变量，于是搜索资料学习了下
+
+
+
+- 查看变量
+
+可用如下命令查看yum中的变量
+
+```
+ python -c 'import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)'
+
+ 输出如下：
+ Loaded plugins: fastestmirror
+ {'arch': 'ia32e',
+  'basearch': 'x86_64',
+  'releasever': '6',
+  'uuid': 'd9361a3a-ca57-4c50-989d-7c5e09dba049'}
+```
+
+
+- Ubuntu中的apt源配置文件样例
+
+相比与yum，apt的源配置文件大致如下
+
+```
+ubuntu:
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+```
+
+
+- yum中两个相同软件名只有版本不同
+
+今天同样遇到一个问题，用yum查看安装的软件时发现有两个完全一样的软件，可用如下方式处理
+
+```
+yum list installed | grep datanode
+hadoop-hdfs-datanode.x86_64    cdh5.5.0************
+hadoop-hdfs-datanode.x86_64    cdh5.2.0************
+
+处理方式：
+
+sudo rpm -ev --noscripts --allmatches hadoop-hdfs-datanode
+```

@@ -57,62 +57,99 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Linux网络基础命令</h2>
-                <p class="post-meta">May 31, 2016</p>
+            <h2>Awk使用nr与fnr合并两个文件</h2>
+                <p class="post-meta">Jun 21, 2016</p>
         </header>
 
         <section class="post-content">
-            <p>最近进行了网络迁移的工作，大致对linux的网络命令做一个简单的纪录</p>
+            <h3 id="awknrfnr">使用awk的NR与FNR合并两个文件</h3>
+<p>工作遇到一个需求有如下两个文件：</p>
 
 <ul>
-  <li>查看IP，基本网络配置</li>
+  <li>file a</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>ip addr show  显示所有网络设备的ip等基本信息
-ifconfig device_name  显示某块网卡的详细信息或者所有网卡的信息
- 其中的frame表示由于CRC引起的错误包的数量，过多一般是硬件问题
-overruns为网卡没有来的急处理丢掉的报
+<div class="highlighter-rouge"><pre class="highlight"><code>store.louguanstar.com	5.6.7.8
+app.louguanstar.com	1.2.3.4
+foo.louguanstar.com	a.b.c.d
 </code></pre>
 </div>
 
 <ul>
-  <li>ethtool</li>
+  <li>file b</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>ethtool -i device_name 显示网络设备驱动信息
-ethtool -S device_name 显示网络设备的详细统计信息（接收到的包，发出去的报，错误包等）
+<div class="highlighter-rouge"><pre class="highlight"><code>foo.louguanstar.com	1300
+store.louguanstar.com	1100
+app.louguanstar.com	1200
 </code></pre>
 </div>
 
-<ul>
-  <li>ping命令快速测试网络质量</li>
-</ul>
+<p>现在需要把这个文件处理为如下样式然后加上xml文件头就行，用作hadoop集群的topology文件</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>ping -c count -f IP   f参数为flood ping只有root用户可执行，可以用来测试网络质量，很快的发送上万个包
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;node name="foo.louguanstar.com" rack="/avatar/1300"/&gt;
+&lt;node name="a.b.c.d" rack="/avatar/1300"/&gt;
+&lt;node name="store.louguanstar.com" rack="/avatar/1100"/&gt;
+&lt;node name="5.6.7.8" rack="/avatar/1100"/&gt;
+&lt;node name="app.louguanstar.com" rack="/avatar/1200"/&gt;
+&lt;node name="1.2.3.4" rack="/avatar/1200"/&gt;
 </code></pre>
 </div>
 
-<ul>
-  <li>
-    <p>网络测试工具，检测
-iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
-  </li>
-  <li>
-    <p>route</p>
-  </li>
-</ul>
+<p>awk可以使用自身变量NR和FNR来处理多个文件。</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>route add -net 192.168.1.0/255.255.255.0 gw 192.168.1.1  添加一条路由记录
+<p>NR：awk开始执行程序后所读取的数据行数。</p>
+
+<p>FNR：awk当前读取的记录数，FNR值小于等于NR（当awk读取第二个文件时，FNR是从0开始重新计数，而NR继续累加）。</p>
+
+<p>NR==FNR：用于在读取两个或两个以上的文件时，判断是不是在读取第一个文件。</p>
+
+<p>awk处理多个文件的基本语法是:
+awk -F分隔符 ‘BEGIN { 初始化 } { 循环执行部分 } END { 结束处理 }’ file1 file2</p>
+
+<p>其中BEGIN和END可以省略，-F用来指定分割符</p>
+
+<p>最后使用如下命令就可以得到上面的结果：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>awk 'NR==FNR{a[$1]=$2}FNR&lt;NR{print $1,a[$1],$2}' a b | awk '{print "&lt;node name=\""$1"\" rack=\"/avatar/"$3"\"/&gt;\n&lt;node name=\""$2"\" rack=\"/avatar/"$3"\"/&gt;"}'
 </code></pre>
 </div>
+
+<p>后面又发现使用awk可以统计每块网卡的网速，命令如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>tmp1=`mktemp`
+tmp2=`mktemp`
+/bin/cat /proc/net/dev | awk 'NR&gt;2 {print $1" tx "$2" ,rx "$10}' |sed 's/://' &gt;$tmp1
+sleep 5
+/bin/cat /proc/net/dev | awk 'NR&gt;2 {print $1" tx "$2" ,rx "$10}' |sed 's/://' &gt;$tmp2
+
+echo ",
+    \"band_width_out\":{"
+awk 'NR==FNR{a[$1]=$3}NR&gt;FNR{print "        \""$1"\":\""($3-a[$1])/5/1024"MB/s\","}' $tmp1 $tmp2
+
+echo "    },
+    \"band_width_in\":{"
+awk 'NR==FNR{a[$1]=$NF}NR&gt;FNR{print "        \""$1"\":\"" ($NF-a[$1])/5/1024"MB/s\","}' $tmp1 $tmp2
+echo "    }"
+rm $tmp1 $tmp2
+</code></pre>
+</div>
+
+<h3 id="section">参考文档</h3>
+
+<blockquote>
+  <ol>
+    <li><a href="http://blog.csdn.net/imzoer/article/details/8734474">http://blog.csdn.net/imzoer/article/details/8734474</a></li>
+  </ol>
+</blockquote>
 
         </section>
 
         <footer>
             
-            <a href="/2016/05/16/Bash%E7%9A%84%E5%A4%A7%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html" class="float-left">&larr; Previous</a> 
+            <a href="/2016/06/06/yarn%E9%85%8D%E7%BD%AEkerberos%E9%9C%80%E8%A6%81%E5%9C%A8%E6%89%80%E6%9C%89nodemanager%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/06/06/yarn%E9%85%8D%E7%BD%AEkerberos%E9%9C%80%E8%A6%81%E5%9C%A8%E6%89%80%E6%9C%89nodemanager%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7.html" class="float-right">Next &rarr;</a> 
+            <a href="/2016/07/19/%E5%85%B3%E4%BA%8Eyum%E7%9A%84%E5%8F%98%E9%87%8F.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 
@@ -122,7 +159,7 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
             <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/05/31/Linux网络基础命令" data-title="Linux网络基础命令" data-url="http://louguanstar.com//2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html"></div>
+                <div class="ds-thread" data-thread-key="/2016/06/21/awk使用NR与FNR合并两个文件" data-title="Awk使用nr与fnr合并两个文件" data-url="http://louguanstar.com//2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">

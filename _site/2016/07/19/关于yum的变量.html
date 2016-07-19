@@ -57,52 +57,75 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Linux网络基础命令</h2>
-                <p class="post-meta">May 31, 2016</p>
+            <h2>关于yum的变量</h2>
+                <p class="post-meta">Jul 19, 2016</p>
         </header>
 
         <section class="post-content">
-            <p>最近进行了网络迁移的工作，大致对linux的网络命令做一个简单的纪录</p>
+            <p>使用yum安装软件的Linux发行版，其关于yum源的配置一般如下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[base]
+name=CentOS-$releasever - Base - 163.com
+baseurl=http://mirrors.163.com/centos/$releasever/os/$basearch/
+#mirrorlist=http://mirrorlist.centos.org/?release=$releasever&amp;arch=$basearch&amp;repo=os
+gpgcheck=1
+gpgkey=http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-6
+
+</code></pre>
+</div>
+
+<p>其中出现了<code class="highlighter-rouge">$releasever</code> , <code class="highlighter-rouge">$basearch</code>这两个变量，于是搜索资料学习了下</p>
 
 <ul>
-  <li>查看IP，基本网络配置</li>
+  <li>查看变量</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>ip addr show  显示所有网络设备的ip等基本信息
-ifconfig device_name  显示某块网卡的详细信息或者所有网卡的信息
- 其中的frame表示由于CRC引起的错误包的数量，过多一般是硬件问题
-overruns为网卡没有来的急处理丢掉的报
+<p>可用如下命令查看yum中的变量</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> python -c 'import yum, pprint; yb = yum.YumBase(); pprint.pprint(yb.conf.yumvar, width=1)'
+
+ 输出如下：
+ Loaded plugins: fastestmirror
+ {'arch': 'ia32e',
+  'basearch': 'x86_64',
+  'releasever': '6',
+  'uuid': 'd9361a3a-ca57-4c50-989d-7c5e09dba049'}
 </code></pre>
 </div>
 
 <ul>
-  <li>ethtool</li>
+  <li>Ubuntu中的apt源配置文件样例</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>ethtool -i device_name 显示网络设备驱动信息
-ethtool -S device_name 显示网络设备的详细统计信息（接收到的包，发出去的报，错误包等）
+<p>相比与yum，apt的源配置文件大致如下</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>ubuntu:
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+deb http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-proposed main restricted universe multiverse
+deb-src http://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
 </code></pre>
 </div>
 
 <ul>
-  <li>ping命令快速测试网络质量</li>
+  <li>yum中两个相同软件名只有版本不同</li>
 </ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>ping -c count -f IP   f参数为flood ping只有root用户可执行，可以用来测试网络质量，很快的发送上万个包
-</code></pre>
-</div>
+<p>今天同样遇到一个问题，用yum查看安装的软件时发现有两个完全一样的软件，可用如下方式处理</p>
 
-<ul>
-  <li>
-    <p>网络测试工具，检测
-iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
-  </li>
-  <li>
-    <p>route</p>
-  </li>
-</ul>
+<div class="highlighter-rouge"><pre class="highlight"><code>yum list installed | grep datanode
+hadoop-hdfs-datanode.x86_64    cdh5.5.0************
+hadoop-hdfs-datanode.x86_64    cdh5.2.0************
 
-<div class="highlighter-rouge"><pre class="highlight"><code>route add -net 192.168.1.0/255.255.255.0 gw 192.168.1.1  添加一条路由记录
+处理方式：
+
+sudo rpm -ev --noscripts --allmatches hadoop-hdfs-datanode
 </code></pre>
 </div>
 
@@ -110,9 +133,8 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
 
         <footer>
             
-            <a href="/2016/05/16/Bash%E7%9A%84%E5%A4%A7%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html" class="float-left">&larr; Previous</a> 
+            <a href="/2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/06/06/yarn%E9%85%8D%E7%BD%AEkerberos%E9%9C%80%E8%A6%81%E5%9C%A8%E6%89%80%E6%9C%89nodemanager%E6%B7%BB%E5%8A%A0%E7%94%A8%E6%88%B7.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 
@@ -122,7 +144,7 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
             <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/05/31/Linux网络基础命令" data-title="Linux网络基础命令" data-url="http://louguanstar.com//2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html"></div>
+                <div class="ds-thread" data-thread-key="/2016/07/19/关于yum的变量" data-title="关于yum的变量" data-url="http://louguanstar.com//2016/07/19/%E5%85%B3%E4%BA%8Eyum%E7%9A%84%E5%8F%98%E9%87%8F.html"></div>
             <!-- 多说评论框 end -->
             <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
             <script type="text/javascript">
