@@ -37,5 +37,9 @@ route add -net 192.168.1.0/255.255.255.0 gw 192.168.1.1  添加一条路由记�
 
 - 小技巧，查看每个IP连接数
 ```
-sed -n 's%.* src=\([0-9]*.[0-9]*.[0-9.]*\).*%\1%p' /proc/net/nf_conntrack  | sort | uniq -c
+sed -n 's%.* src=\([0-9]*.[0-9]*.[0-9.]*\).*%\1%p' /proc/net/nf_conntrack  | sort | uniq -c   #部分机器可能不发查看
+```
+
+```
+netstat -n | awk '/^tcp/ {n=split($(NF-1),array,":");if(n<=2)++S[array[(1)]];else++S[array[(4)]];++s[$NF];++N} END {for(a in S){printf("%-20s %s\n", a, S[a]);++I}printf("%-20s %s\n","TOTAL_IP",I);for(a in s) printf("%-20s %s\n",a, s[a]);printf("%-20s %s\n","TOTAL_LINK",N);}'    #仅TCP连接
 ```
