@@ -1,0 +1,67 @@
+---
+layout: post
+---
+#### 某台server突然根目录占用空间98%，但找不到占用空间的文件
+
+### 问题产生
+
+发现一台server根目录占用满，使用df -h命令查看，根目录确实占用已90%
+
+```
+[root@localhost /]# df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda1             190G  172G  8.0G  96% /
+/dev/sdb1             2.7T  1.4T  1.2T  56% /hahaha
+
+```
+
+使用du命令查找/目录下大文件
+
+```
+[root@localhost ~]# du -sh --exclude=hahaha /*
+8.5M    /bin
+6.5M    /boot
+4.0K    /CmdTool.log
+388K    /dev
+126M    /etc
+116M    /home
+149M    /lib
+35M     /lib64
+16K     /lost+found
+8.0K    /media
+12K     /MegaSAS.log
+8.0K    /misc
+7.9G    /mnt
+17M     /Nagios-Plugin
+44M     /opt
+0       /proc
+356K    /root
+40M     /sbin
+8.0K    /selinux
+8.0K    /srv
+0       /sys
+100K    /tftpboot
+2.2M    /tmp
+6.2G    /usr
+1.2G    /var
+
+```
+
+### 解决问题
+将/目录再次挂载到/mnt下查看，发现异常,然后进入/mnt/hahaha目录下删除文件
+```
+[root@localhost /]# mount -o bind / /mnt
+[root@localhost /]# du -sh   /mnt/*
+8.5M    /mnt/bin
+8.0K    /mnt/boot
+4.0K    /mnt/CmdTool.log
+165G    /mnt/hahaha
+...
+6.2G    /mnt/usr
+1.2G    /mnt/var
+
+```
+
+### 总结
+在删除`/mnt/hahaha`目录下的异常文件时先检查下文件内容以及使用`lsof`确认下文件是否在被使用
+最终问题产生的根源是由于挂载的不细心，由于服务器一些基本维护另有分工所以造成了发现问题有些难度（和问题的产生）
