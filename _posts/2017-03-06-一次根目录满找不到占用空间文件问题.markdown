@@ -15,8 +15,7 @@ Filesystem            Size  Used Avail Use% Mounted on
 
 ```
 
-使用du命令查找/目录下大文件
-
+使用du命令查找/目录下大文件；使用`lsof | grep delete`没有发现已删除文件进程仍占用的
 ```
 [root@localhost ~]# du -sh --exclude=hahaha /*
 8.5M    /bin
