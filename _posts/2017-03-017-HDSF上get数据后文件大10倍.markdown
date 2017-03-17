@@ -1,0 +1,46 @@
+---
+layout: post
+---
+#### 从HDFS上get下一个目录，get下之后目录体积为HDFS上10+倍
+
+### 问题产生
+
+从HDFS上get下一个目录，目录原本很小以为会很快，查看了下本地目录大小，却逐渐超过hdfs上10倍之多
+
+```
+HDFS上文件大小
+[louguanstar@localhost ~]$ sudo hadoop fs -du -s -h /user/hive/warehouse/test.db
+53.3 M  160.0 M  /user/hive/warehouse/test.db
+
+完成后本地文件大小
+[louguanstar@localhost ~]$ du -sh test.db
+642M    test.db
+
+```
+
+推测可能是文件系统block大小影响的，但是10倍之多有些不可思议，好奇心驱使所以验证下
+```
+查看文件系统block大小
+[louguanstar@localhost ~]$ sudo /sbin/tune2fs -l /dev/sda2
+tune2fs 1.39 (29-May-2006)
+Filesystem volume name:   /
+...
+Filesystem OS type:       Linux
+Inode count:              25624576
+Block count:              25599577
+Reserved block count:     1279978
+Free blocks:              14624498
+Free inodes:              25103644
+First block:              0
+Block size:               4096
+...
+
+统计文件个数
+[louguanstar@localhost ~]$ ls -lR test.db |grep "^-"|wc -l
+149179
+
+```
+
+
+### 总结
+文件数居然有如此之多，大致计算下`149179*4/1024=582.73046875`及时每个文件都小于4K在本地文件系统已有583MB，此时结果已经很明了了
