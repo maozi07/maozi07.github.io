@@ -106,6 +106,17 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
 </code></pre>
 </div>
 
+<ul>
+  <li>小技巧，查看每个IP连接数
+<code class="highlighter-rouge">
+sed -n 's%.* src=\([0-9]*.[0-9]*.[0-9.]*\).*%\1%p' /proc/net/nf_conntrack  | sort | uniq -c   #部分机器可能不发查看
+</code></li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>netstat -n | awk '/^tcp/ {n=split($(NF-1),array,":");if(n&lt;=2)++S[array[(1)]];else++S[array[(4)]];++s[$NF];++N} END {for(a in S){printf("%-20s %s\n", a, S[a]);++I}printf("%-20s %s\n","TOTAL_IP",I);for(a in s) printf("%-20s %s\n",a, s[a]);printf("%-20s %s\n","TOTAL_LINK",N);}'    #仅TCP连接
+</code></pre>
+</div>
+
         </section>
 
         <footer>
@@ -121,22 +132,6 @@ iperf测试网卡速度，iftop/iptraf Linux下监测网络流量工具</p>
                 <li>本文系原创，转载请注明：转自<a target="_blank" href="http://www.louguanstar.com">LouguanStar's Blog</a>，作者：<a target="_blank" href="http://wwww.louguanstar.com/about/">LouguanStar</a></li>
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
-            <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/05/31/Linux网络基础命令" data-title="Linux网络基础命令" data-url="http://louguanstar.com//2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html"></div>
-            <!-- 多说评论框 end -->
-            <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-            <script type="text/javascript">
-            var duoshuoQuery = {short_name:"louguanstar"};
-                (function() {
-                    var ds = document.createElement('script');
-                    ds.type = 'text/javascript';ds.async = true;
-                    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-                    ds.charset = 'UTF-8';
-                    (document.getElementsByTagName('head')[0]
-                     || document.getElementsByTagName('body')[0]).appendChild(ds);
-                })();
-            </script>
-            <!-- 多说公共JS代码 end -->
         </div>
 
     </div>

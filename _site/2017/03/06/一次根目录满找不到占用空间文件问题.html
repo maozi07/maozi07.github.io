@@ -57,66 +57,83 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Yarn配置kerberos需要在所有nodemanager添加用户</h2>
-                <p class="post-meta">Jun 6, 2016</p>
+            <h2>一次根目录满找不到占用空间文件问题</h2>
+                <p class="post-meta">Mar 6, 2017</p>
         </header>
 
         <section class="post-content">
-            <p>yarn添加kerberos认证需要在所有nodemanager上添加kerberos principal用户</p>
+            <h4 id="server98">某台server突然根目录占用空间98%，但找不到占用空间的文件</h4>
 
-<h3 id="section">发现问题</h3>
+<h3 id="section">问题产生</h3>
 
-<p>同事反应yarn提交任务有问题，发现yarn配置了kerberos认证，于是给新建的用户添加了principal，并且生成了keytab</p>
+<p>发现一台server根目录占用满，使用df -h命令查看，根目录确实占用已90%</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>添加principal
-kadmin.local -q "addprinc -randkey spark_deploy@LOUGUANSTAR.COM"
-生成keytab
-kadmin.local -q "ktadd -k spark_deploy.keytab spark_deploy@LOUGUANSTAR.COM"
+<div class="highlighter-rouge"><pre class="highlight"><code>[root@localhost /]# df -h
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/sda1             190G  172G  8.0G  96% /
+/dev/sdb1             2.7T  1.4T  1.2T  56% /hahaha
 
-其他kerberos操作：
-删除principal
-kadmin.local -q "delprinc spark_deploy@LOUGUANSTAR.COM"
-查看所有principal
-./kadmin.local -q "listprincs" | grep spark
 </code></pre>
 </div>
 
-<p>然后进行kerberos认证，尝试提交任务</p>
+<p>使用du命令查找/目录下大文件；使用<code class="highlighter-rouge">lsof | grep delete</code>没有发现已删除文件进程仍占用的
+```
+[root@localhost ~]# du -sh –exclude=hahaha /*
+8.5M    /bin
+6.5M    /boot
+4.0K    /CmdTool.log
+388K    /dev
+126M    /etc
+116M    /home
+149M    /lib
+35M     /lib64
+16K     /lost+found
+8.0K    /media
+12K     /MegaSAS.log
+8.0K    /misc
+7.9G    /mnt
+17M     /Nagios-Plugin
+44M     /opt
+0       /proc
+356K    /root
+40M     /sbin
+8.0K    /selinux
+8.0K    /srv
+0       /sys
+100K    /tftpboot
+2.2M    /tmp
+6.2G    /usr
+1.2G    /var</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>kinit -kt spark_deploy.keytab spark_deploy
-hadoop jar  /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.5.2.jar pi 10 100
+<div class="highlighter-rouge"><pre class="highlight"><code>
+### 解决问题
+将/目录再次挂载到/mnt下查看，发现异常,然后进入/mnt/hahaha目录下删除文件
 </code></pre>
 </div>
-<p>任务很快结束，jobhistory中找不到日志，resourcemanager中的报错信息很简短，错误信息大致如下：</p>
+<p>[root@localhost /]# mount -o bind / /mnt
+[root@localhost /]# du -sh   /mnt/*
+8.5M    /mnt/bin
+8.0K    /mnt/boot
+4.0K    /mnt/CmdTool.log
+165G    /mnt/hahaha
+…
+6.2G    /mnt/usr
+1.2G    /mnt/var</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>main : run as user is spark_deploy
-main : requested yarn user is spark_deploy
-User spark_deploy not found
-</code></pre>
-</div>
+<p>```</p>
 
-<h3 id="section-1">解决问题</h3>
+<h3 id="section-1">总结</h3>
+<p>在删除<code class="highlighter-rouge">/mnt/hahaha</code>目录下的异常文件时先检查下文件内容以及使用<code class="highlighter-rouge">lsof</code>确认下文件是否在被使用</p>
 
-<p>始终觉得问题在设置yarn.nodemanager.linux-container-executor的问题上，如果没有设置kerberos认证那么可以指定运行yarn.nodemanager.linux-container-executor；配置了kerberos之后yarn任务的用户为kerberos principal中的用户如：spark_deploy@LOUGUANSTAR.COM中即为spark_deploy
-经历了多半天各种调试，最后发现：<code class="highlighter-rouge">配置kerberos之后必须在每个nodemanager上新建kerberos principal中的用户</code>，这样才能确保每个任务都可以在nodemanager上运行</p>
-
-<p>在所有nodemanager上添加spark_deploy用户，问题成功解决</p>
-
-<h3 id="section-2">参考文档</h3>
-
-<blockquote>
-  <ol>
-    <li><a href="https://community.cloudera.com/t5/Batch-Processing-and-Workflow/YARN-force-nobody-user-on-all-jobs-and-so-they-fail/td-p/26050">https://community.cloudera.com/t5/Batch-Processing-and-Workflow/YARN-force-nobody-user-on-all-jobs-and-so-they-fail/td-p/26050</a></li>
-  </ol>
-</blockquote>
+<p>最终问题产生的根源是由于挂载的不细心，由于服务器一些基本维护另有分工所以造成了发现问题有些难度（和问题的产生）</p>
 
         </section>
 
         <footer>
             
-            <a href="/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html" class="float-left">&larr; Previous</a> 
+            <a href="/2016/07/19/%E5%85%B3%E4%BA%8Eyum%E7%9A%84%E5%8F%98%E9%87%8F.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html" class="float-right">Next &rarr;</a> 
+            <a href="/2017/03/17/HDSF%E4%B8%8Aget%E6%95%B0%E6%8D%AE%E5%90%8E%E6%96%87%E4%BB%B6%E5%A4%A710%E5%80%8D.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 

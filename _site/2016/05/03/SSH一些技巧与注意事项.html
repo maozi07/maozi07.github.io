@@ -83,6 +83,8 @@
 
 <p>很多时候出问题的地方在用户Home目录，.ssh目录可用ssh-keygen命令生成，一般问题不大</p>
 
+<p>使用了selinux策略的系统，selinux可能会造成无密钥无法连接</p>
+
         </section>
 
         <footer>
@@ -98,22 +100,6 @@
                 <li>本文系原创，转载请注明：转自<a target="_blank" href="http://www.louguanstar.com">LouguanStar's Blog</a>，作者：<a target="_blank" href="http://wwww.louguanstar.com/about/">LouguanStar</a></li>
                 <li>除特别说明外，本文基于<a target="_blank" href="http://creativecommons.org/licenses/by-sa/3.0/cn/">知识共享署名-相同方式共享 3.0 中国大陆许可协议</a>发布，转载或其它引用请保留文本署名和文章链接。</li>
             </ul>
-            <!-- 多说评论框 start -->
-                <div class="ds-thread" data-thread-key="/2016/05/03/SSH一些技巧与注意事项" data-title="Ssh一些技巧与注意事项" data-url="http://louguanstar.com//2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html"></div>
-            <!-- 多说评论框 end -->
-            <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
-            <script type="text/javascript">
-            var duoshuoQuery = {short_name:"louguanstar"};
-                (function() {
-                    var ds = document.createElement('script');
-                    ds.type = 'text/javascript';ds.async = true;
-                    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
-                    ds.charset = 'UTF-8';
-                    (document.getElementsByTagName('head')[0]
-                     || document.getElementsByTagName('body')[0]).appendChild(ds);
-                })();
-            </script>
-            <!-- 多说公共JS代码 end -->
         </div>
 
     </div>

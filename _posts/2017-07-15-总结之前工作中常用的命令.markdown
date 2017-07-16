@@ -1,0 +1,76 @@
+---
+layout: post
+---
+
+### 关于hadoop
+
+```
+#手动切换active与standby
+sudo -u hdfs hdfs haadmin -failover nn2 nn1
+#查看namenode状态
+sudo -u hdfs hdfs haadmin -getServiceState nn1
+#启动standby
+sudo -u hdfs hadoop namenode -bootstrapStandby
+#退出safe mode
+sudo -u hdfs hadoop dfsadmin -safemode leave
+#刷新hdfs节点
+sudo hadoop dfsadmin -refreshNodes
+```
+
+### 关于YARN
+
+```
+#查看application日志
+yarn logs -applicationId application_..._0010
+#杀掉某个job
+sudo -u yarn yarn application -kill application_..._0004
+#刷新yarn节点
+sudo yarn rmadmin -refreshNodes
+```
+
+### Kerberos
+
+```
+#Kerberos初始化简要
+krb5.conf
+kadm5.acl
+kdb5_util create -r LOUGUANSTAR.COM -s
+shell% kadmin.local
+kadmin.local: addprinc admin/admin@LOUGUANSTAR.COM
+krb5kdc
+kadmind
+#列出所有principal
+kadmin.local -q "list_principals"
+kadmin.local -q "listprincs"
+#添加principal
+kadmin.local -q "addprinc -randkey test/test1.louguanstar.com@LOUGUANSTAR.COM"
+#生成keytab
+kadmin.local -q "ktadd -k impala116.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM"
+kadmin.local -q "ktadd -k impala163.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM adc/test1.louguanstar.com@LOUGUANSTAR.COM"
+#认证
+kinit -kt yarn.keytab yarn/yarn.louguanstar.com@LOUGUANSTAR.COM
+#删除principal
+kadmin.local -q "delprinc spark_deploy@LENOVOMM2.COM"
+```
+
+### Hive
+
+```
+#hdfs集群名更换后hive不能启动，需要修改metastore
+UPDATE `SDS` SET `LOCATION` = replace(LOCATION, 'master:9000', 'louguanstar');
+#hive查看建表语句
+show create table dbname.tablename
+```
+
+### 其他
+
+```
+#查看某个java进程的“日志”
+jstack PID
+#jvm申请内存问题，修改Linux内存管理方式
+sysctl vm.overcommit_memory=1
+/etc/sysctl.conf
+vm.overcommit_memory = 1
+#CDH使用的所有端口
+cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_ports_cdh5.html#topic_9_1
+```

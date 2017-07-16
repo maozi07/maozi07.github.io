@@ -57,66 +57,90 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>Yarn配置kerberos需要在所有nodemanager添加用户</h2>
-                <p class="post-meta">Jun 6, 2016</p>
+            <h2>总结之前工作中常用的命令</h2>
+                <p class="post-meta">Jul 15, 2017</p>
         </header>
 
         <section class="post-content">
-            <p>yarn添加kerberos认证需要在所有nodemanager上添加kerberos principal用户</p>
+            <h3 id="hadoop">关于hadoop</h3>
 
-<h3 id="section">发现问题</h3>
-
-<p>同事反应yarn提交任务有问题，发现yarn配置了kerberos认证，于是给新建的用户添加了principal，并且生成了keytab</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>添加principal
-kadmin.local -q "addprinc -randkey spark_deploy@LOUGUANSTAR.COM"
-生成keytab
-kadmin.local -q "ktadd -k spark_deploy.keytab spark_deploy@LOUGUANSTAR.COM"
-
-其他kerberos操作：
-删除principal
-kadmin.local -q "delprinc spark_deploy@LOUGUANSTAR.COM"
-查看所有principal
-./kadmin.local -q "listprincs" | grep spark
+<div class="highlighter-rouge"><pre class="highlight"><code>#手动切换active与standby
+sudo -u hdfs hdfs haadmin -failover nn2 nn1
+#查看namenode状态
+sudo -u hdfs hdfs haadmin -getServiceState nn1
+#启动standby
+sudo -u hdfs hadoop namenode -bootstrapStandby
+#退出safe mode
+sudo -u hdfs hadoop dfsadmin -safemode leave
+#刷新hdfs节点
+sudo hadoop dfsadmin -refreshNodes
 </code></pre>
 </div>
 
-<p>然后进行kerberos认证，尝试提交任务</p>
+<h3 id="yarn">关于YARN</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>kinit -kt spark_deploy.keytab spark_deploy
-hadoop jar  /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.5.2.jar pi 10 100
-</code></pre>
-</div>
-<p>任务很快结束，jobhistory中找不到日志，resourcemanager中的报错信息很简短，错误信息大致如下：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>main : run as user is spark_deploy
-main : requested yarn user is spark_deploy
-User spark_deploy not found
+<div class="highlighter-rouge"><pre class="highlight"><code>#查看application日志
+yarn logs -applicationId application_..._0010
+#杀掉某个job
+sudo -u yarn yarn application -kill application_..._0004
+#刷新yarn节点
+sudo yarn rmadmin -refreshNodes
 </code></pre>
 </div>
 
-<h3 id="section-1">解决问题</h3>
+<h3 id="kerberos">Kerberos</h3>
 
-<p>始终觉得问题在设置yarn.nodemanager.linux-container-executor的问题上，如果没有设置kerberos认证那么可以指定运行yarn.nodemanager.linux-container-executor；配置了kerberos之后yarn任务的用户为kerberos principal中的用户如：spark_deploy@LOUGUANSTAR.COM中即为spark_deploy
-经历了多半天各种调试，最后发现：<code class="highlighter-rouge">配置kerberos之后必须在每个nodemanager上新建kerberos principal中的用户</code>，这样才能确保每个任务都可以在nodemanager上运行</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>#Kerberos初始化简要
+krb5.conf
+kadm5.acl
+kdb5_util create -r LOUGUANSTAR.COM -s
+shell% kadmin.local
+kadmin.local: addprinc admin/admin@LOUGUANSTAR.COM
+krb5kdc
+kadmind
+#列出所有principal
+kadmin.local -q "list_principals"
+kadmin.local -q "listprincs"
+#添加principal
+kadmin.local -q "addprinc -randkey test/test1.louguanstar.com@LOUGUANSTAR.COM"
+#生成keytab
+kadmin.local -q "ktadd -k impala116.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM"
+kadmin.local -q "ktadd -k impala163.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM adc/test1.louguanstar.com@LOUGUANSTAR.COM"
+#认证
+kinit -kt yarn.keytab yarn/yarn.louguanstar.com@LOUGUANSTAR.COM
+#删除principal
+kadmin.local -q "delprinc spark_deploy@LENOVOMM2.COM"
+</code></pre>
+</div>
 
-<p>在所有nodemanager上添加spark_deploy用户，问题成功解决</p>
+<h3 id="hive">Hive</h3>
 
-<h3 id="section-2">参考文档</h3>
+<div class="highlighter-rouge"><pre class="highlight"><code>#hdfs集群名更换后hive不能启动，需要修改metastore
+UPDATE `SDS` SET `LOCATION` = replace(LOCATION, 'master:9000', 'louguanstar');
+#hive查看建表语句
+show create table dbname.tablename
+</code></pre>
+</div>
 
-<blockquote>
-  <ol>
-    <li><a href="https://community.cloudera.com/t5/Batch-Processing-and-Workflow/YARN-force-nobody-user-on-all-jobs-and-so-they-fail/td-p/26050">https://community.cloudera.com/t5/Batch-Processing-and-Workflow/YARN-force-nobody-user-on-all-jobs-and-so-they-fail/td-p/26050</a></li>
-  </ol>
-</blockquote>
+<h3 id="section">其他</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#查看某个java进程的“日志”
+jstack PID
+#jvm申请内存问题，修改Linux内存管理方式
+sysctl vm.overcommit_memory=1
+/etc/sysctl.conf
+vm.overcommit_memory = 1
+#CDH使用的所有端口
+cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_ports_cdh5.html#topic_9_1
+</code></pre>
+</div>
 
         </section>
 
         <footer>
             
-            <a href="/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html" class="float-left">&larr; Previous</a> 
+            <a href="/2017/03/17/HDSF%E4%B8%8Aget%E6%95%B0%E6%8D%AE%E5%90%8E%E6%96%87%E4%BB%B6%E5%A4%A710%E5%80%8D.html" class="float-left">&larr; Previous</a> 
             
-            <a href="/2016/06/21/awk%E4%BD%BF%E7%94%A8NR%E4%B8%8EFNR%E5%90%88%E5%B9%B6%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 
