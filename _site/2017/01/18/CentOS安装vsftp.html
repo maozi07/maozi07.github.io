@@ -57,90 +57,108 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>总结之前工作中常用的命令</h2>
-                <p class="post-meta">Jul 15, 2017</p>
+            <h2>Centos安装vsftp</h2>
+                <p class="post-meta">Jan 18, 2017</p>
         </header>
 
         <section class="post-content">
-            <h3 id="hadoop">关于hadoop</h3>
+            <h3 id="section">本地用户/系统用户</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#手动切换active与standby
-sudo -u hdfs hdfs haadmin -failover nn2 nn1
-#查看namenode状态
-sudo -u hdfs hdfs haadmin -getServiceState nn1
-#启动standby
-sudo -u hdfs hadoop namenode -bootstrapStandby
-#退出safe mode
-sudo -u hdfs hadoop dfsadmin -safemode leave
-#刷新hdfs节点
-sudo hadoop dfsadmin -refreshNodes
+<div class="highlighter-rouge"><pre class="highlight"><code>useradd -g ftp -d /vsftp/test1 -s /sbin/nologin -M test1
+useradd -g ftp -d /vsftp/test2 -s /sbin/nologin -M test2
+useradd -g ftp -d /vsftp/test3 -s /sbin/nologin -M test3
+
+mkdir -p /vsftp/test1 /vsftp/test2 /vsftp/test3;chown -R ftp:ftp /vsftp
+</code></pre>
+</div>
+<ul>
+  <li>配置文件样例</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#user test1 config file sample in /etc/vsftp/vconf
+
+local_root=/vsftp/test1
+anon_world_readable_only=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+
+vsftp.conf  sample
+anonymous_enable=NO
+local_enable=YES
+chroot_local_user=YES
+user_config_dir=/ect/vsftpd/vconf
 </code></pre>
 </div>
 
-<h3 id="yarn">关于YARN</h3>
+<ul>
+  <li>上传文件的权限</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#查看application日志
-yarn logs -applicationId application_..._0010
-#杀掉某个job
-sudo -u yarn yarn application -kill application_..._0004
-#刷新yarn节点
-sudo yarn rmadmin -refreshNodes
+<p>用户以及组与ftp用户相同</p>
+
+<h3 id="section-1">虚拟用户</h3>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>yum install db4-utils
+db_load -T -t hash -f /etc/vsftpd/user.txt /etc/vsftpd/vftpuser.db
+change /etc/pam.d/vsftp like this:
+auth required /lib64/security/pam_userdb.so db=/etc/vsftpd/vftpuser
+account required /lib64/security/pam_userdb.so db=/etc/vsftpd/vftpuser
 </code></pre>
 </div>
 
-<h3 id="kerberos">Kerberos</h3>
+<ul>
+  <li>vsftp.conf sample</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#Kerberos初始化简要
-krb5.conf
-kadm5.acl
-kdb5_util create -r LOUGUANSTAR.COM -s
-shell% kadmin.local
-kadmin.local: addprinc admin/admin@LOUGUANSTAR.COM
-krb5kdc
-kadmind
-#列出所有principal
-kadmin.local -q "list_principals"
-kadmin.local -q "listprincs"
-#添加principal
-kadmin.local -q "addprinc -randkey test/test1.louguanstar.com@LOUGUANSTAR.COM"
-#生成keytab
-kadmin.local -q "ktadd -k impala116.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM"
-kadmin.local -q "ktadd -k impala163.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM adc/test1.louguanstar.com@LOUGUANSTAR.COM"
-#认证
-kinit -kt yarn.keytab yarn/yarn.louguanstar.com@LOUGUANSTAR.COM
-#删除principal
-kadmin.local -q "delprinc spark_deploy@LENOVOMM2.COM"
+<div class="highlighter-rouge"><pre class="highlight"><code>anonymous_enable=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+guest_enable=YES
+guest_username=ftp
+user_sub_token=$USER
+local_root=/vsftp/$USER
+hide_ids=YES
+virtual_use_local_privs=YES
+local_enable=YES
+chroot_local_user=YES
+write_enable=YES
+local_umask=022
+pam_service_name=vsftpd  #pam file path /etc/pam.d/vsftpd
 </code></pre>
 </div>
 
-<h3 id="hive">Hive</h3>
+<ul>
+  <li>user config file sample not correct in centos5</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#hdfs集群名更换后hive不能启动，需要修改metastore
-UPDATE `SDS` SET `LOCATION` = replace(LOCATION, 'master:9000', 'louguanstar');
-#hive查看建表语句
-show create table dbname.tablename
+<div class="highlighter-rouge"><pre class="highlight"><code>#user test1 config file sample in /etc/vsftp/vconf
+
+local_root=/vsftp/vs1
+write_enable=YES
+download_enable=YES
+anon_world_readable_only=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+local_umask=022
 </code></pre>
 </div>
 
-<h3 id="section">其他</h3>
+<ul>
+  <li>uploaded file mode</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#查看某个java进程的“日志”
-jstack PID
-#jvm申请内存问题，修改Linux内存管理方式
-sysctl vm.overcommit_memory=1
-/etc/sysctl.conf
-vm.overcommit_memory = 1
-#CDH使用的所有端口
-cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_ports_cdh5.html#topic_9_1
-</code></pre>
-</div>
+<p>file user,group are the guset user’s</p>
 
         </section>
 
         <footer>
             
-            <a href="/2017/07/07/%E5%85%B3%E4%BA%8Emysql.html" class="float-left">&larr; Previous</a> 
+            <a href="/2016/07/19/%E5%85%B3%E4%BA%8Eyum%E7%9A%84%E5%8F%98%E9%87%8F.html" class="float-left">&larr; Previous</a> 
             
+            <a href="/2017/03/06/%E4%B8%80%E6%AC%A1%E6%A0%B9%E7%9B%AE%E5%BD%95%E6%BB%A1%E6%89%BE%E4%B8%8D%E5%88%B0%E5%8D%A0%E7%94%A8%E7%A9%BA%E9%97%B4%E6%96%87%E4%BB%B6%E9%97%AE%E9%A2%98.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 

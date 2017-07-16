@@ -1,0 +1,69 @@
+---
+layout: post
+---
+
+### 关于mysql设置
+
+- 查看mysql状态
+
+```
+show status
+#一些说明
+   Threads_connected  当前连接数
+   Connections  试图连接到(无论是否成功)MySQL服务器连接数。
+   Max_used_connections  服务器启动后已经同时使用的连接的最大数量。
+```
+
+- 查看最大连接数
+
+```
+show variables like '%max_connections%';
+```
+
+- 设置最大连接数
+
+```
+set GLOBAL max_connections=连接数;
+flush privileges
+```
+
+- 修改配置文件设置最大连接数
+
+```
+修改或者添加/etc/my.cnf中的max_connections参数
+```
+
+- 显示所有用户当前执行的连接
+
+```
+show global variables like '%timeout%';
+```
+
+- 设置server超时时间（秒）
+
+```
+msyql> set global wait_timeout=300;
+msyql> set global interactive_timeout=300;
+show full processlist   显示当前正在执行的mysql连接
+```
+
+- 设置表为只读
+
+```
+找到表数据
+myisampack -f VERSION.MYI
+myisamchk -rq VERSION
+mysqladmin -uroot flush-tables -p
+#解除
+myisamchk --unpack VERSION.MYI
+mysqladmin -uroot flush-tables -p
+```
+
+- 其他
+
+```  
+mysqld --skip-grant-tables &   #mysql忘记密码处理，同时可以处理密码旧格式问题
+#重置密码
+update user set password=password("new_pass") where user="root";
+UPDATE mysql.user SET password=PASSWORD('123456') WHERE user='root';
+```

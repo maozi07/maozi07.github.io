@@ -6,8 +6,8 @@
 </description>
     <link>http://louguanstar.com/</link>
     <atom:link href="http://louguanstar.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 16 Jul 2017 16:06:51 +0800</pubDate>
-    <lastBuildDate>Sun, 16 Jul 2017 16:06:51 +0800</lastBuildDate>
+    <pubDate>Sun, 16 Jul 2017 16:52:17 +0800</pubDate>
+    <lastBuildDate>Sun, 16 Jul 2017 16:52:17 +0800</lastBuildDate>
     <generator>Jekyll v3.1.3</generator>
     
       <item>
@@ -88,6 +88,249 @@ cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_p
         <pubDate>Sat, 15 Jul 2017 00:00:00 +0800</pubDate>
         <link>http://louguanstar.com/2017/07/15/%E6%80%BB%E7%BB%93%E4%B9%8B%E5%89%8D%E5%B7%A5%E4%BD%9C%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4.html</link>
         <guid isPermaLink="true">http://louguanstar.com/2017/07/15/%E6%80%BB%E7%BB%93%E4%B9%8B%E5%89%8D%E5%B7%A5%E4%BD%9C%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>关于mysql</title>
+        <description>&lt;h3 id=&quot;mysql&quot;&gt;关于mysql设置&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;查看mysql状态&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;show status
+#一些说明
+   Threads_connected  当前连接数
+   Connections  试图连接到(无论是否成功)MySQL服务器连接数。
+   Max_used_connections  服务器启动后已经同时使用的连接的最大数量。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;查看最大连接数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;show variables like &#39;%max_connections%&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;设置最大连接数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;set GLOBAL max_connections=连接数;
+flush privileges
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;修改配置文件设置最大连接数&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;修改或者添加/etc/my.cnf中的max_connections参数
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;显示所有用户当前执行的连接&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;show global variables like &#39;%timeout%&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;设置server超时时间（秒）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;msyql&amp;gt; set global wait_timeout=300;
+msyql&amp;gt; set global interactive_timeout=300;
+show full processlist   显示当前正在执行的mysql连接
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;设置表为只读&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;找到表数据
+myisampack -f VERSION.MYI
+myisamchk -rq VERSION
+mysqladmin -uroot flush-tables -p
+#解除
+myisamchk --unpack VERSION.MYI
+mysqladmin -uroot flush-tables -p
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;其他&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mysqld --skip-grant-tables &amp;amp;   #mysql忘记密码处理，同时可以处理密码旧格式问题
+#重置密码
+update user set password=password(&quot;new_pass&quot;) where user=&quot;root&quot;;
+UPDATE mysql.user SET password=PASSWORD(&#39;123456&#39;) WHERE user=&#39;root&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Fri, 07 Jul 2017 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2017/07/07/%E5%85%B3%E4%BA%8Emysql.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2017/07/07/%E5%85%B3%E4%BA%8Emysql.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Cdh安装</title>
+        <description>&lt;h3 id=&quot;section&quot;&gt;准备工作&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;java相应版本&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;mysql(mariadb/postgresql)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#以mariadb为例
+https://mariadb.com/kb/en/mariadb/installing-mariadb-binary-tarballs/
+groupadd mysql
+useradd -g mysql mysql
+tar -zxvf mariadb-10.1.13-linux-x86_64.tar.gz
+ln -s mariadb-10.1.13-linux-x86_64 mysql
+cd mysql
+./scripts/mysql_install_db --user=mysql
+chown -R root .
+chown -R mysql data
+./bin/mysqld_safe --user=mysql &amp;amp;
+./bin/mysqladmin -u root password &#39;123456&#39;
+cp support-files/mysql.server /etc/init.d/mysql.server
+
+grant all privileges on *.* to root@&#39;%&#39; IDENTIFIED BY &#39;123456&#39; WITH GRANT OPTION;
+flush privileges;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;parcel&quot;&gt;使用parcel&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir /opt/cloudera-manager
+tar -xzvf cloudera-manager-el5-cm5.6.0_x86_64.tar.gz -C /opt/cloudera-manager
+useradd --system --home=/opt/cloudera-manager/cm-5.6.0/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment &quot;Cloudera SCM User&quot; cloudera-scm
+#prepare database
+./scm_prepare_database.sh mysql localhost cdh -uroot -p123456
+
+mkdir /var/log/cloudera-scm-server
+chown cloudera-scm:cloudera-scm /var/log/cloudera-scm-server
+
+mkdir -p /opt/cloudera/parcel-repo
+mkdir -p /opt/cloudera/parcels
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;rpm&quot;&gt;使用rpm包&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#server:
+rpm -ivh cloudera-manager-daemons-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+rpm -ivh cloudera-manager-server-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+
+#agent:
+rpm -ivh cloudera-manager-daemons-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+rpm -ivh cloudera-manager-agent-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+#databae
+/usr/share/cmf/schema/scm_prepare_database.sh mysql -h localhost -uroot -p123456 scm scm scm
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;yum&quot;&gt;使用本地yum源安装&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;hdfs&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#Namenode server:
+yum -y install hadoop hadoop-hdfs hadoop-client hadoop-doc hadoop-debuginfo hadoop-hdfs-namenode hadoop-httpfs
+
+#Secondnary namenode server:
+yum -y install hadoop-hdfs-secondarynamenode
+
+#Data node:
+yum -y install hadoop hadoop-hdfs hadoop-client hadoop-doc hadoop-debuginfo hadoop-hdfs-datanode
+
+#journal node:
+yum -y install hadoop-hdfs-journalnode hadoop-hdfs-zkfc
+#creat dirs
+mkdir -p /data/hadoop/dfs/{data,jn,name}
+chown -R hdfs:hdfs /data/hadoop/dfs/
+
+mkdir -p /data/hadoop/tmp/dfs/{data,jn,name}
+chown -R hdfs:hdfs /data/hadoop/tmp
+#format hdfs
+sudo -u hdfs hadoop namenode -format
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;yarn&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#resource manager:
+yum -y install hadoop-yarn hadoop-yarn-resourcemanager hadoop-mapreduce-historyserver hadoop-yarn-proxyserver
+
+#node manager:
+yum -y install hadoop-yarn hadoop-yarn-nodemanager hadoop-mapreduce
+#create dirs
+mkdir -p /data/hadoop/yarn/{local,logs}
+chown -R yarn:yarn /data/hadoop/yarn
+sudo -u hdfs hadoop fs -mkdir -p /var/log/hadoop-yarn/apps
+sudo -u hdfs hadoop fs -chown -R yarn:yarn /var/log/hadoop-yarn
+mkdir -p /data/hadoop/tmp/mapred/staging/history/done
+chown -R yarn:yarn /data/hadoop/tmp/mapred
+sudo -u hdfs hadoop fs -mkdir -p /data/hadoop/tmp/mapred
+sudo -u hdfs hadoop fs -chown -R mapred:mapred /data/hadoop/tmp/mapred
+#start process
+/etc/init.d/hadoop-yarn-resourcemanager start
+/etc/init.d/hadoop-yarn-nodemanager start
+/etc/init.d/hadoop-mapreduce-historyserver start
+#run a test
+sudo -u hdfs hadoop jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar pi 10 10
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;hive&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#metastore:
+yum -y install hive hive-metastore hive-server2 hive-jdbc
+yum -y install hive hive-server2 hive-jdbc
+#mysql for metastore
+yum -y install mysql-libs mysql-devel
+ln -s /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar
+mysql -u root -p123456 -e &quot;
+    CREATE DATABASE metastore;
+    USE metastore;
+    SOURCE /usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-1.1.0.mysql.sql;
+    CREATE USER &#39;hiveuser&#39;@&#39;master&#39; IDENTIFIED BY &#39;123456&#39;;
+    GRANT ALL PRIVILEGES ON metastore.* TO &#39;hiveuser&#39;@&#39;master&#39;;
+    GRANT ALL PRIVILEGES ON metastore.* TO &#39;hiveuser&#39;@&#39;%&#39;;
+    FLUSH PRIVILEGES;
+&quot;
+#create dirs
+sudo -u hdfs hadoop fs -mkdir -p /user/hive/warehouse
+sudo -u hdfs hadoop fs -chown -R hive:hive /user/hive
+sudo -u hdfs hadoop fs -chmod 1777 /user/hive/warehouse
+#start process
+/etc/init.d/hive-metastore start
+/etc/init.d/hive-server2 start
+
+hive开启并发必须启动zookeeper
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Wed, 05 Jul 2017 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2017/07/05/CDH%E5%AE%89%E8%A3%85.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2017/07/05/CDH%E5%AE%89%E8%A3%85.html</guid>
         
         
       </item>
@@ -214,6 +457,105 @@ Filesystem            Size  Used Avail Use% Mounted on
         <pubDate>Mon, 06 Mar 2017 00:00:00 +0800</pubDate>
         <link>http://louguanstar.com/2017/03/06/%E4%B8%80%E6%AC%A1%E6%A0%B9%E7%9B%AE%E5%BD%95%E6%BB%A1%E6%89%BE%E4%B8%8D%E5%88%B0%E5%8D%A0%E7%94%A8%E7%A9%BA%E9%97%B4%E6%96%87%E4%BB%B6%E9%97%AE%E9%A2%98.html</link>
         <guid isPermaLink="true">http://louguanstar.com/2017/03/06/%E4%B8%80%E6%AC%A1%E6%A0%B9%E7%9B%AE%E5%BD%95%E6%BB%A1%E6%89%BE%E4%B8%8D%E5%88%B0%E5%8D%A0%E7%94%A8%E7%A9%BA%E9%97%B4%E6%96%87%E4%BB%B6%E9%97%AE%E9%A2%98.html</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Centos安装vsftp</title>
+        <description>&lt;h3 id=&quot;section&quot;&gt;本地用户/系统用户&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;useradd -g ftp -d /vsftp/test1 -s /sbin/nologin -M test1
+useradd -g ftp -d /vsftp/test2 -s /sbin/nologin -M test2
+useradd -g ftp -d /vsftp/test3 -s /sbin/nologin -M test3
+
+mkdir -p /vsftp/test1 /vsftp/test2 /vsftp/test3;chown -R ftp:ftp /vsftp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;配置文件样例&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#user test1 config file sample in /etc/vsftp/vconf
+
+local_root=/vsftp/test1
+anon_world_readable_only=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+
+vsftp.conf  sample
+anonymous_enable=NO
+local_enable=YES
+chroot_local_user=YES
+user_config_dir=/ect/vsftpd/vconf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;上传文件的权限&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;用户以及组与ftp用户相同&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;虚拟用户&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;yum install db4-utils
+db_load -T -t hash -f /etc/vsftpd/user.txt /etc/vsftpd/vftpuser.db
+change /etc/pam.d/vsftp like this:
+auth required /lib64/security/pam_userdb.so db=/etc/vsftpd/vftpuser
+account required /lib64/security/pam_userdb.so db=/etc/vsftpd/vftpuser
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;vsftp.conf sample&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;anonymous_enable=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+guest_enable=YES
+guest_username=ftp
+user_sub_token=$USER
+local_root=/vsftp/$USER
+hide_ids=YES
+virtual_use_local_privs=YES
+local_enable=YES
+chroot_local_user=YES
+write_enable=YES
+local_umask=022
+pam_service_name=vsftpd  #pam file path /etc/pam.d/vsftpd
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;user config file sample not correct in centos5&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#user test1 config file sample in /etc/vsftp/vconf
+
+local_root=/vsftp/vs1
+write_enable=YES
+download_enable=YES
+anon_world_readable_only=NO
+anon_upload_enable=YES
+anon_mkdir_write_enable=YES
+anon_other_write_enable=YES
+local_umask=022
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;uploaded file mode&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;file user,group are the guset user’s&lt;/p&gt;
+</description>
+        <pubDate>Wed, 18 Jan 2017 00:00:00 +0800</pubDate>
+        <link>http://louguanstar.com/2017/01/18/CentOS%E5%AE%89%E8%A3%85vsftp.html</link>
+        <guid isPermaLink="true">http://louguanstar.com/2017/01/18/CentOS%E5%AE%89%E8%A3%85vsftp.html</guid>
         
         
       </item>
@@ -501,208 +843,6 @@ sed -n &#39;s%.* src=\([0-9]*.[0-9]*.[0-9.]*\).*%\1%p&#39; /proc/net/nf_conntrac
         <pubDate>Tue, 31 May 2016 00:00:00 +0800</pubDate>
         <link>http://louguanstar.com/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html</link>
         <guid isPermaLink="true">http://louguanstar.com/2016/05/31/Linux%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Bash的大括号高级特性</title>
-        <description>&lt;p&gt;本文主要详细介绍Bash中{}的详细用法，由于Bash中的变量类型只有字符串故下文字符串与变量同指代Bash中的变量，部分配有例子。&lt;/p&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;字符串基本&lt;/h3&gt;
-&lt;p&gt;string=1234.123&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;分隔变量与字符串&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo ${string}1    #1234.1231
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;ul&gt;
-  &lt;li&gt;${#string}统计变量字符串长度&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo ${#string}    #8
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;ul&gt;
-  &lt;li&gt;${string:start:length}截取字符串，从第start个字符开始共length个字符&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo ${string:7:1}    #3
-echo ${string:(-4)}    #.123
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;section-1&quot;&gt;字符串匹配切片（可用来踢去文件后缀，文件路径等）&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;${string#substring}删除最先匹配到的字符（substring）的左边&lt;/li&gt;
-  &lt;li&gt;${string##substring}删除最后匹配到的字符（substring）的左边&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;stringZ=abcABC123ABCabc
-#删除最先匹配的左边
-echo ${stringZ#a*C}   #123ABCabc
-#删除最后匹配到的左边
-echo ${stringZ##a*C}   #abc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;ul&gt;
-  &lt;li&gt;${string%substring}从string后边开始匹配，删除最先匹配到（substring）的右边&lt;/li&gt;
-  &lt;li&gt;${string%%substring}从string后边开始匹配，删除最后匹配到（substring）的右边&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;string=abcABC123ABCabc
-echo ${string%abc}    #abcABC123ABC
-echo ${string%%A*}    #abc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;注意&lt;code class=&quot;highlighter-rouge&quot;&gt;本小节中的substring必须为全匹配&lt;/code&gt;，所以例子中才会出现通配符*，如下：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;string=abcABC123ABCabc
-echo ${string##123}    #abcABC123ABCabc
-echo ${string%%123}    #abcABC123ABCabc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;section-2&quot;&gt;字符串替换&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;${string/substring/replacement}    将第一个匹配到的substring替换为replacement&lt;/li&gt;
-  &lt;li&gt;${string//substring/replacement}    将所有匹配到的substring替换为replacement&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;string=abcABC123ABCabc
-echo ${string/abc/xyz}    #xyzABC123ABCabc
-echo ${string//abc/xyz}    #xyzABC123ABCxyz
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;ul&gt;
-  &lt;li&gt;${string/#substring/replacement}   将字符串开始匹配（全匹配）到的第一个substring用replacement替换&lt;/li&gt;
-  &lt;li&gt;${string/%substring/replacement}   从字符串末尾开始匹配，将第一个匹配（全匹配）到的substring用replacement替换&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;string=abcABC123ABCabc
-echo ${string/#a*c/xyz}    #xyz
-echo ${string/%abc/xyz}    #abcABC123ABCxyz
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;section-3&quot;&gt;变量判断&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;${parameter-default}, ${parameter:-default}&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;如果变量parameter没有赋值，default最为parameter默认值，:的区别在于变量parameter已经被声明但是null&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;${parameter=default}, ${parameter:=default}&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;如果变量parameter没有声明，default最为parameter默认值，:的区别在于变量parameter已经被声明但是null&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;${parameter+alt_value}, ${parameter:+alt_value}&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;如果变量parameter已经设定，使用alt_value，否则使用null&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;${parameter?err_msg}, ${parameter:?err_msg}，:的区别在于变量parameter已经被声明但是null&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;如果变量parameter已经设定，使用变量，否则打印err_msg退出脚本返回状态码1&lt;/p&gt;
-
-&lt;h3 id=&quot;section-4&quot;&gt;参考文档与相关链接&lt;/h3&gt;
-&lt;blockquote&gt;
-  &lt;ol&gt;
-    &lt;li&gt;&lt;a href=&quot;http://www.tldp.org/LDP/abs/abs-guide.pdf&quot;&gt;Advanced Bash-Scripting Guide&lt;/a&gt;&lt;/li&gt;
-  &lt;/ol&gt;
-&lt;/blockquote&gt;
-</description>
-        <pubDate>Mon, 16 May 2016 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2016/05/16/Bash%E7%9A%84%E5%A4%A7%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2016/05/16/Bash%E7%9A%84%E5%A4%A7%E6%8B%AC%E5%8F%B7%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Freebsd入门</title>
-        <description>&lt;p&gt;FreeBSD作为一款Unix操作表现出强大的稳定性与安全性，乔布斯曾挖走FreeBSD的创始人去开发Mac OSX所依两者有很多相似的地方。个人使用感觉两者的稳定性比起Linux要优秀很多。今日闲来无事就在虚拟机上体验了下。&lt;/p&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;软件管理&lt;/h3&gt;
-
-&lt;p&gt;首先直接跳过了操作系统的安装，说实话对于一个熟悉Linux的人来说，FreeBSD的安装不会有什么大的问题。FreeBSD／OSX包含的工作也很多与Linux相同，这也是为什么很多码农喜欢用Mac的原因之一吧。&lt;/p&gt;
-
-&lt;h4 id=&quot;pkgpackagesport&quot;&gt;pkg(packages)与port&lt;/h4&gt;
-
-&lt;p&gt;packages与port都为FreeBSD下安装程序的工具，packages用来安装二进制包，ports使用源码来安装程序。两者都可以处理包的依赖关系，使用packages或port来安装应用时都会安装有相应依赖关系的程序或者库。以下为两者的一些主要区别：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;一个压缩过的二进制安装包通常比一个包含源码的包小&lt;/li&gt;
-  &lt;li&gt;Packages不需要额外的编译时间，对于大的应用比如：FireFox，KED，GNOME编译会比较久&lt;/li&gt;
-  &lt;li&gt;使用port编译时可以添加一些编译选项，比如编译Apache可以指定包含哪些模块，二进制包能包含大多数情况&lt;/li&gt;
-  &lt;li&gt;有些许可禁止使用二进制包分发&lt;/li&gt;
-  &lt;li&gt;有人可能觉得二进制包不安全或者喜欢通过阅读源码去解决一些问题&lt;/li&gt;
-  &lt;li&gt;源码对自己打补丁很有用&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;最新的FreeBSD已经抛弃老的pkg工作，老式的系统安装软件使用pkg_add，现在的则是pkg install。在最近的FreeBSD中pkg与yum／apt这类工具更相似，使得FreeBSD下安装软件更容易。不过由于FreeBSD最近才切换到新的pkg，所以如果你使用的FreeBSD10.X（9.X未验证，8.X都是老的pkg）就可以方便的使用pkg，不过由于这个比较新所以国内没有可用的pkg源，包括阿里、中科大等都没有源可用，国内使用体验很是不好（全球官方列出的源也不超过10个）。&lt;/p&gt;
-
-&lt;h4 id=&quot;pkg&quot;&gt;pkg使用&lt;/h4&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;查找软件&lt;code class=&quot;highlighter-rouge&quot;&gt;pkg search package_name&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;安装软件&lt;code class=&quot;highlighter-rouge&quot;&gt;pkg install package_name&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;删除软件&lt;code class=&quot;highlighter-rouge&quot;&gt;pkg delete package_name&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;删除不再需要的依赖&lt;code class=&quot;highlighter-rouge&quot;&gt;pkg autoremove&lt;/code&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;section-1&quot;&gt;参考文档与相关链接&lt;/h3&gt;
-&lt;blockquote&gt;
-  &lt;ol&gt;
-    &lt;li&gt;handbook,FreeBSD的官方文档还是很齐全的，需要什么都可以去官网找到，绝对应用尽有&lt;/li&gt;
-    &lt;li&gt;&lt;a href=&quot;ftp://ftp.cn.freebsd.org/pub/FreeBSD/&quot;&gt;官方FTP中国站点：ftp://ftp.cn.freebsd.org/pub/FreeBSD/&lt;/a&gt;&lt;/li&gt;
-  &lt;/ol&gt;
-&lt;/blockquote&gt;
-</description>
-        <pubDate>Wed, 04 May 2016 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2016/05/04/FreeBSD%E5%85%A5%E9%97%A8.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2016/05/04/FreeBSD%E5%85%A5%E9%97%A8.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Ssh一些技巧与注意事项</title>
-        <description>&lt;p&gt;主要记录平时使用SSH过程中积累的一些经验&lt;/p&gt;
-
-&lt;h3 id=&quot;ssh&quot;&gt;关于SSH密钥&lt;/h3&gt;
-
-&lt;p&gt;SSH生成密钥的命令，使用下面的命令可直接生成密钥，避免交互输入，可直接写成shell脚本&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh-keygen -t rsa -P &#39;&#39; -f ~/.ssh/id_rsa
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;ssh-1&quot;&gt;需要注意的，会引起SSH无密钥无法工作&lt;/h3&gt;
-
-&lt;p&gt;SSH以无密钥运行时会检测文件系统相关文件的权限，如若文件权限不合适，SSH会认为不安全，造成无密钥无法连接&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;用户Home目录权限应为755/644组成员与其他人不可拥有写入权限&lt;/li&gt;
-  &lt;li&gt;.ssh目录权限应为700&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;很多时候出问题的地方在用户Home目录，.ssh目录可用ssh-keygen命令生成，一般问题不大&lt;/p&gt;
-
-&lt;p&gt;使用了selinux策略的系统，selinux可能会造成无密钥无法连接&lt;/p&gt;
-</description>
-        <pubDate>Tue, 03 May 2016 00:00:00 +0800</pubDate>
-        <link>http://louguanstar.com/2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html</link>
-        <guid isPermaLink="true">http://louguanstar.com/2016/05/03/SSH%E4%B8%80%E4%BA%9B%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9.html</guid>
         
         
       </item>

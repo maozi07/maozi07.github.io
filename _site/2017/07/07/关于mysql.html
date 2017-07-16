@@ -57,81 +57,90 @@
                 <section>
     <div class="container">
         <header class="major">
-            <h2>总结之前工作中常用的命令</h2>
-                <p class="post-meta">Jul 15, 2017</p>
+            <h2>关于mysql</h2>
+                <p class="post-meta">Jul 7, 2017</p>
         </header>
 
         <section class="post-content">
-            <h3 id="hadoop">关于hadoop</h3>
+            <h3 id="mysql">关于mysql设置</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#手动切换active与standby
-sudo -u hdfs hdfs haadmin -failover nn2 nn1
-#查看namenode状态
-sudo -u hdfs hdfs haadmin -getServiceState nn1
-#启动standby
-sudo -u hdfs hadoop namenode -bootstrapStandby
-#退出safe mode
-sudo -u hdfs hadoop dfsadmin -safemode leave
-#刷新hdfs节点
-sudo hadoop dfsadmin -refreshNodes
+<ul>
+  <li>查看mysql状态</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>show status
+#一些说明
+   Threads_connected  当前连接数
+   Connections  试图连接到(无论是否成功)MySQL服务器连接数。
+   Max_used_connections  服务器启动后已经同时使用的连接的最大数量。
 </code></pre>
 </div>
 
-<h3 id="yarn">关于YARN</h3>
+<ul>
+  <li>查看最大连接数</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#查看application日志
-yarn logs -applicationId application_..._0010
-#杀掉某个job
-sudo -u yarn yarn application -kill application_..._0004
-#刷新yarn节点
-sudo yarn rmadmin -refreshNodes
+<div class="highlighter-rouge"><pre class="highlight"><code>show variables like '%max_connections%';
 </code></pre>
 </div>
 
-<h3 id="kerberos">Kerberos</h3>
+<ul>
+  <li>设置最大连接数</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#Kerberos初始化简要
-krb5.conf
-kadm5.acl
-kdb5_util create -r LOUGUANSTAR.COM -s
-shell% kadmin.local
-kadmin.local: addprinc admin/admin@LOUGUANSTAR.COM
-krb5kdc
-kadmind
-#列出所有principal
-kadmin.local -q "list_principals"
-kadmin.local -q "listprincs"
-#添加principal
-kadmin.local -q "addprinc -randkey test/test1.louguanstar.com@LOUGUANSTAR.COM"
-#生成keytab
-kadmin.local -q "ktadd -k impala116.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM"
-kadmin.local -q "ktadd -k impala163.keytab test/test1.louguanstar.com@LOUGUANSTAR.COM adc/test1.louguanstar.com@LOUGUANSTAR.COM"
-#认证
-kinit -kt yarn.keytab yarn/yarn.louguanstar.com@LOUGUANSTAR.COM
-#删除principal
-kadmin.local -q "delprinc spark_deploy@LENOVOMM2.COM"
+<div class="highlighter-rouge"><pre class="highlight"><code>set GLOBAL max_connections=连接数;
+flush privileges
 </code></pre>
 </div>
 
-<h3 id="hive">Hive</h3>
+<ul>
+  <li>修改配置文件设置最大连接数</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#hdfs集群名更换后hive不能启动，需要修改metastore
-UPDATE `SDS` SET `LOCATION` = replace(LOCATION, 'master:9000', 'louguanstar');
-#hive查看建表语句
-show create table dbname.tablename
+<div class="highlighter-rouge"><pre class="highlight"><code>修改或者添加/etc/my.cnf中的max_connections参数
 </code></pre>
 </div>
 
-<h3 id="section">其他</h3>
+<ul>
+  <li>显示所有用户当前执行的连接</li>
+</ul>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>#查看某个java进程的“日志”
-jstack PID
-#jvm申请内存问题，修改Linux内存管理方式
-sysctl vm.overcommit_memory=1
-/etc/sysctl.conf
-vm.overcommit_memory = 1
-#CDH使用的所有端口
-cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_ports_cdh5.html#topic_9_1
+<div class="highlighter-rouge"><pre class="highlight"><code>show global variables like '%timeout%';
+</code></pre>
+</div>
+
+<ul>
+  <li>设置server超时时间（秒）</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>msyql&gt; set global wait_timeout=300;
+msyql&gt; set global interactive_timeout=300;
+show full processlist   显示当前正在执行的mysql连接
+</code></pre>
+</div>
+
+<ul>
+  <li>设置表为只读</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>找到表数据
+myisampack -f VERSION.MYI
+myisamchk -rq VERSION
+mysqladmin -uroot flush-tables -p
+#解除
+myisamchk --unpack VERSION.MYI
+mysqladmin -uroot flush-tables -p
+</code></pre>
+</div>
+
+<ul>
+  <li>其他</li>
+</ul>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>mysqld --skip-grant-tables &amp;   #mysql忘记密码处理，同时可以处理密码旧格式问题
+#重置密码
+update user set password=password("new_pass") where user="root";
+UPDATE mysql.user SET password=PASSWORD('123456') WHERE user='root';
 </code></pre>
 </div>
 
@@ -139,8 +148,9 @@ cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_p
 
         <footer>
             
-            <a href="/2017/07/07/%E5%85%B3%E4%BA%8Emysql.html" class="float-left">&larr; Previous</a> 
+            <a href="/2017/07/05/CDH%E5%AE%89%E8%A3%85.html" class="float-left">&larr; Previous</a> 
             
+            <a href="/2017/07/15/%E6%80%BB%E7%BB%93%E4%B9%8B%E5%89%8D%E5%B7%A5%E4%BD%9C%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4.html" class="float-right">Next &rarr;</a> 
 
         </footer>
 

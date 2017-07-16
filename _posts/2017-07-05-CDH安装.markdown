@@ -1,0 +1,135 @@
+---
+layout: post
+---
+
+### 准备工作
+- java相应版本
+
+- mysql(mariadb/postgresql)
+
+```
+#以mariadb为例
+https://mariadb.com/kb/en/mariadb/installing-mariadb-binary-tarballs/
+groupadd mysql
+useradd -g mysql mysql
+tar -zxvf mariadb-10.1.13-linux-x86_64.tar.gz
+ln -s mariadb-10.1.13-linux-x86_64 mysql
+cd mysql
+./scripts/mysql_install_db --user=mysql
+chown -R root .
+chown -R mysql data
+./bin/mysqld_safe --user=mysql &
+./bin/mysqladmin -u root password '123456'
+cp support-files/mysql.server /etc/init.d/mysql.server
+
+grant all privileges on *.* to root@'%' IDENTIFIED BY '123456' WITH GRANT OPTION;
+flush privileges;
+```
+
+### 使用parcel
+
+```
+mkdir /opt/cloudera-manager
+tar -xzvf cloudera-manager-el5-cm5.6.0_x86_64.tar.gz -C /opt/cloudera-manager
+useradd --system --home=/opt/cloudera-manager/cm-5.6.0/run/cloudera-scm-server --no-create-home --shell=/bin/false --comment "Cloudera SCM User" cloudera-scm
+#prepare database
+./scm_prepare_database.sh mysql localhost cdh -uroot -p123456
+
+mkdir /var/log/cloudera-scm-server
+chown cloudera-scm:cloudera-scm /var/log/cloudera-scm-server
+
+mkdir -p /opt/cloudera/parcel-repo
+mkdir -p /opt/cloudera/parcels
+```
+
+### 使用rpm包
+
+```
+#server:
+rpm -ivh cloudera-manager-daemons-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+rpm -ivh cloudera-manager-server-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+
+#agent:
+rpm -ivh cloudera-manager-daemons-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+rpm -ivh cloudera-manager-agent-5.6.0-1.cm560.p0.54.el5.x86_64.rpm
+#databae
+/usr/share/cmf/schema/scm_prepare_database.sh mysql -h localhost -uroot -p123456 scm scm scm
+```
+
+### 使用本地yum源安装
+- hdfs
+
+```
+#Namenode server:
+yum -y install hadoop hadoop-hdfs hadoop-client hadoop-doc hadoop-debuginfo hadoop-hdfs-namenode hadoop-httpfs
+
+#Secondnary namenode server:
+yum -y install hadoop-hdfs-secondarynamenode
+
+#Data node:
+yum -y install hadoop hadoop-hdfs hadoop-client hadoop-doc hadoop-debuginfo hadoop-hdfs-datanode
+
+#journal node:
+yum -y install hadoop-hdfs-journalnode hadoop-hdfs-zkfc
+#creat dirs
+mkdir -p /data/hadoop/dfs/{data,jn,name}
+chown -R hdfs:hdfs /data/hadoop/dfs/
+
+mkdir -p /data/hadoop/tmp/dfs/{data,jn,name}
+chown -R hdfs:hdfs /data/hadoop/tmp
+#format hdfs
+sudo -u hdfs hadoop namenode -format
+```
+- yarn
+
+```
+#resource manager:
+yum -y install hadoop-yarn hadoop-yarn-resourcemanager hadoop-mapreduce-historyserver hadoop-yarn-proxyserver
+
+#node manager:
+yum -y install hadoop-yarn hadoop-yarn-nodemanager hadoop-mapreduce
+#create dirs
+mkdir -p /data/hadoop/yarn/{local,logs}
+chown -R yarn:yarn /data/hadoop/yarn
+sudo -u hdfs hadoop fs -mkdir -p /var/log/hadoop-yarn/apps
+sudo -u hdfs hadoop fs -chown -R yarn:yarn /var/log/hadoop-yarn
+mkdir -p /data/hadoop/tmp/mapred/staging/history/done
+chown -R yarn:yarn /data/hadoop/tmp/mapred
+sudo -u hdfs hadoop fs -mkdir -p /data/hadoop/tmp/mapred
+sudo -u hdfs hadoop fs -chown -R mapred:mapred /data/hadoop/tmp/mapred
+#start process
+/etc/init.d/hadoop-yarn-resourcemanager start
+/etc/init.d/hadoop-yarn-nodemanager start
+/etc/init.d/hadoop-mapreduce-historyserver start
+#run a test
+sudo -u hdfs hadoop jar /usr/lib/hadoop-mapreduce/hadoop-mapreduce-examples.jar pi 10 10
+```
+
+- hive
+
+```
+#metastore:
+yum -y install hive hive-metastore hive-server2 hive-jdbc
+yum -y install hive hive-server2 hive-jdbc
+#mysql for metastore
+yum -y install mysql-libs mysql-devel
+ln -s /usr/share/java/mysql-connector-java.jar /usr/lib/hive/lib/mysql-connector-java.jar
+mysql -u root -p123456 -e "
+    CREATE DATABASE metastore;
+    USE metastore;
+    SOURCE /usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-1.1.0.mysql.sql;
+    CREATE USER 'hiveuser'@'master' IDENTIFIED BY '123456';
+    GRANT ALL PRIVILEGES ON metastore.* TO 'hiveuser'@'master';
+    GRANT ALL PRIVILEGES ON metastore.* TO 'hiveuser'@'%';
+    FLUSH PRIVILEGES;
+"
+#create dirs
+sudo -u hdfs hadoop fs -mkdir -p /user/hive/warehouse
+sudo -u hdfs hadoop fs -chown -R hive:hive /user/hive
+sudo -u hdfs hadoop fs -chmod 1777 /user/hive/warehouse
+#start process
+/etc/init.d/hive-metastore start
+/etc/init.d/hive-server2 start
+
+hive开启并发必须启动zookeeper
+```
