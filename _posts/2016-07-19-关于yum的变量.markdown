@@ -76,4 +76,3 @@ reposync -c /etc/yum.repos.d/docker-ce.repo -p /data/docker-ce-repo/ -e /data/do
 createrepo --update -v -c /data/tmp/ -o /data/docker-ce-repo/docker-ce-stable/ /data/docker-ce-repo/docker-ce-stable/ 
 ```
 
-处理方式：
