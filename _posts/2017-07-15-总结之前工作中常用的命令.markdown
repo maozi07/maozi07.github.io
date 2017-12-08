@@ -67,6 +67,10 @@ show create table dbname.tablename
 ```
 #查看某个java进程的“日志”
 jstack PID
+#查看某java进程的jvm占用情况
+jmap -heap PID
+#查看某java进程GC状况
+jstat -gcutil PID
 #jvm申请内存问题，修改Linux内存管理方式
 sysctl vm.overcommit_memory=1
 /etc/sysctl.conf
