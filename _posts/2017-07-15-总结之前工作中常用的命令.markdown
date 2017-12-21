@@ -76,5 +76,5 @@ sysctl vm.overcommit_memory=1
 /etc/sysctl.conf
 vm.overcommit_memory = 1
 #CDH使用的所有端口
-cdh port:https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_ports_cdh5.html#topic_9_1
+cdh port    https://www.cloudera.com/documentation/enterprise/5-2-x/topics/cdh_ig_ports_cdh5.html#topic_9_1
 ```
