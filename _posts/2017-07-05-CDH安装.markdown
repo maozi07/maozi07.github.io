@@ -133,3 +133,9 @@ sudo -u hdfs hadoop fs -chmod 1777 /user/hive/warehouse
 
 hive开启并发必须启动zookeeper
 ```
+
+- spark
+
+```
+spark-shell,pyspark命令机器依赖本地环境变量JAVA_HOME
+```
