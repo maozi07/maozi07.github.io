@@ -28,7 +28,7 @@ sudo -u yarn yarn application -kill application_..._0004
 sudo yarn rmadmin -refreshNodes
 
 #配置capacity scheduler acl不生效问题
-需在queue的最顶层设置，即root.acl_submit_applications和root.acl_administer_queue。如果不设置root.acl_submit_applications和root.acl_administer_queue时，默认所有子queue都会有所有权限（可将此两个配置的值都设置为空格，取消所有用户的权限)
+需在queue的最顶层设置，即root.acl_submit_applications和root.acl_administer_queue。如果不设置root.acl_submit_applications和root.acl_administer_queue时，默认所有子queue都会有所有权限（可将此两个配置的值都设置为空格，取消所有用户的权限)。 If the given user/group has necessary ACLs on the given queue or one of the parent queues in the hierarchy they can submit applications（如果用户队列本身的权限，或者父队列的权限，那么用户就可以提交任务）
 <property>
   <name>yarn.scheduler.capacity.root.acl_submit_applications</name>
   <value>USER1,USER2</value>
@@ -37,7 +37,7 @@ sudo yarn rmadmin -refreshNodes
   <name>yarn.scheduler.capacity.root.acl_administer_queue</name>
   <value>USER1,USER2</value>
 </property>
-参考：http://blog.csdn.net/opensure/article/details/78296877
+
 #查看用户acl权限
 sudo -u USER mapred queue  -showacls
 ```
