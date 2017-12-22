@@ -26,6 +26,19 @@ yarn logs -applicationId application_..._0010
 sudo -u yarn yarn application -kill application_..._0004
 #刷新yarn节点
 sudo yarn rmadmin -refreshNodes
+
+#配置capacity scheduler acl不生效问题
+需在queue的最顶层设置，即root.acl_submit_applications和root.acl_administer_queue。如果不设置root.acl_submit_applications和root.acl_administer_queue时，默认所有子queue都会有所有权限（可将此两个配置的值都设置为空格，取消所有用户的权限)
+<property>
+  <name>yarn.scheduler.capacity.root.acl_submit_applications</name>
+  <value>USER1,USER2</value>
+</property>
+<property>
+  <name>yarn.scheduler.capacity.root.acl_administer_queue</name>
+  <value>USER1,USER2</value>
+</property>
+#查看用户acl权限
+sudo -u USER mapred queue  -showacls
 ```
 
 ### Kerberos
