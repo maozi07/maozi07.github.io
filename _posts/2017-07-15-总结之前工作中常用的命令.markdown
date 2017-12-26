@@ -40,6 +40,9 @@ sudo yarn rmadmin -refreshNodes
 
 #查看用户acl权限
 sudo -u USER mapred queue  -showacls
+
+#yarn node-label问题
+'yarn.scheduler.capacity.<queue-path>.default-node-label-expression'的值只能有1个
 ```
 
 ### Kerberos
