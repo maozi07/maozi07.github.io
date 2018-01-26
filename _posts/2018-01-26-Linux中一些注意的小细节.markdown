@@ -5,6 +5,6 @@ layout: post
 ### 注意的地方
 
 ```
-#'|'管道命令只会保留stdout，若要保留stderr使用'|&\
+#'|'管道命令只会保留stdout，若要保留stderr使用'|&'
 
 ```
