@@ -82,7 +82,7 @@ show create table dbname.tablename
 ### 其他
 
 ```
-#查看某个java进程的“日志”
+#查看某个java进程的“日志”，需使用与java进程同一用户运行
 jstack PID
 #查看某java进程的jvm占用情况
 jmap -heap PID
