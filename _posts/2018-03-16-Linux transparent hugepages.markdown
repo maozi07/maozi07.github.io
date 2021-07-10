@@ -1,7 +1,6 @@
 ---
 layout: post
 ---
-
 ### 关于THP(transparent hugepages)
 
 Transparent Huge Pages 在centos6中默认启动。内核会尝试申请大页（2M pages普通一般为64K），来减小TLB压力；启用THP在某些情况下可提高10%性能。
