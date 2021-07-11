@@ -19,6 +19,11 @@ SSH以无密钥运行时会检测文件系统相关文件的权限，如若文�
 1. 用户Home目录权限应为755/644组成员与其他人不可拥有写入权限
 2. .ssh目录权限应为700
 
+### SSH命令选项
+
+1. -o ConnectTimeout=3 #指定超时为3秒，以防部分节点不可访问长时间等待
+2. -o StrictHostKeyChecking=no #不检查host key，节点重装系统后默认需要手动输入yes/no确认；确保安全的环境下使用
+
 很多时候出问题的地方在用户Home目录，.ssh目录可用ssh-keygen命令生成，一般问题不大
 
 使用了selinux策略的系统，selinux可能会造成无密钥无法连接
