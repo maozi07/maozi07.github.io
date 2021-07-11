@@ -1,0 +1,149 @@
+---
+layout: post
+---
+### CPU负载检查清单
+
+1. 整个系统范围内的CPU使用率是多少？每个CPU呢？
+2. CPU负载的并发程度如何？是单线程吗？有多少线程？
+3. 哪个应用程序或者用户程序在使用CPU？用了多少？
+4. 哪个内核线程在使用CPU？用了多少？
+5. 终端的CPU用量是多少？
+6. CPU互联的使用率是多少？
+7. 为什么CPU被使用（用户和内核级别调用路径）？
+8. 遇到了什么类型的停滞周期？
+
+### 静态性能调优检查清单
+
+1. 有多少CPU可用？是核心吗？还是硬件线程？
+2. CPU的架构是单处理器还是多处理器？
+3. CPU缓存的大小是多少？是共享的吗？
+4. CPU时钟频率是多少？是动态的（如Intel睿频）吗？这些动态性在BIOS中启用了吗？
+5. BIOS里启用或者禁用了其他什么CPU相关的特性？
+6. 这款型号的处理器有什么性能问题（bug）？出现在处理器勘误表上了吗？
+7. 这个BIOS固件版本有什么性能问题（bug）吗？
+8. 有软件的CPU使用闲置（资源控制）吗？是什么？
+
+### 使用到的工具
+
+- 清单
+
+| Tool | 描述 | 
+| ------ | ------ | 
+| uptime | 平均负载 | 
+| vmstat | 包括系统范围内的CPU平均负载 |
+| mpstat | 单个CPU统计信息 |
+| sar    | 历史统计信息 |
+| ps     | 进程状态 |
+| top    | 监控每个进程/线程CPU用量 |
+| pidstat | 每个进程/线程CPU用量分析 |
+| time    | 给一个命令计时，带CPU用量分析 |
+| DTrace,perf  | CPU剖析和跟踪 |
+
+- uptime
+
+```bash
+[root@test ~]# uptime
+ 08:16:36 up 152 days,  1:42,  1 user,  load average: 0.00, 0.00, 0.00
+ #长时间的负载平均无法反应一些短暂的突发
+```
+
+- vmstat
+
+```bash
+[root@vultr ~]# vmstat 1
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 2  0      0 611748  48872 225424    0    0     0     0    0    2  0  0 100  0  0
+ 0  0      0 611748  48872 225424    0    0     0     0   36   56  1  0 99  0  0
+ [...]
+# 格式说明
+Procs
+    r: The number of runnable processes (running or waiting for run time).
+    b: Number of processes blocked waiting for I/O to complete.
+
+Memory
+    swpd: the amount of virtual memory used.
+    free: the amount of idle memory.
+    buff: the amount of memory used as buffers.
+    cache: the amount of memory used as cache.
+    inact: the amount of inactive memory.  (-a option)
+    active: the amount of active memory.  (-a option)
+
+Swap
+    si: Amount of memory swapped in from disk (/s).
+    so: Amount of memory swapped to disk (/s).
+
+IO
+    bi: Blocks received from a block device (blocks/s).
+    bo: Blocks sent to a block device (blocks/s).
+
+System
+    in: The number of interrupts per second, including the clock.
+    cs: The number of context switches per second.
+
+CPU
+    These are percentages of total CPU time.
+    us: Time spent running non-kernel code.  (user time, including nice time)
+    sy: Time spent running kernel code.  (system time)
+    id: Time spent idle.  Prior to Linux 2.5.41, this includes IO-wait time.
+    wa: Time spent waiting for IO.  Prior to Linux 2.5.41, included in idle.
+    st: Time stolen from a virtual machine.  Prior to Linux 2.6.11, unknown.
+```
+
+- mpstat
+
+```bash
+[root@test ~]# mpstat -P ALL 1 
+Linux 4.14.91-bbrplus (test.guest)     07/11/2021      _x86_64_        (1 CPU)
+
+08:25:54 AM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+08:25:55 AM  all    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+08:25:55 AM    0    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+
+08:25:55 AM  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+08:25:56 AM  all    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+08:25:56 AM    0    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00
+[...]
+# -P ALL 1 显示所有CPU，每1秒钟执行一次
+CPU：CPU ID，all表示总和
+%usr：用户态时间
+%nice：以nice优先级运行的用户态时间
+%sys：内核台态时间
+%iowait：IO等待
+%irq：硬件中断
+%soft：软件中断
+%steal：虚拟CPU或虚拟进程（如云环境）
+%guest：虚拟进程
+%gnice：Show the percentage of time spent by the CPU or CPUs to run a niced guest.
+%idle：空闲
+```
+
+- sar
+
+```
+* -P ALL 1：与mpstat -P ALL 1相同
+* -q：包括runq-sz（运行队列长度）
+```
+
+- pidstat
+
+```bash
+[root@test ~]# pidstat 1
+Linux 4.14.91-bbrplus (test.guest)     07/11/2021      _x86_64_        (1 CPU)
+
+08:40:28 AM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
+
+08:40:29 AM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
+
+08:40:30 AM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
+08:40:31 AM     0     12292    0.00    1.00    0.00    1.00     0  pidstat
+# 每1秒循环输出活动进程的信息
+```
+
+- 上述工具的详细用法详见man page
+
+
+
+### 参考资料
+> 1. 性能之巅：洞悉系统、企业与云计算 电子工业出版社2015.8
+> 2. Linux man page
